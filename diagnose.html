@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>タビゴ | 旅英語 実力診断</title>
+<style>
+:root{
+  --bg:#F2F5F4; --card:#FFFFFF; --ink:#20302D; --sub:#5F6E6A; --line:#DBE3E1;
+  --accent:#12706B; --accent-ink:#FFFFFF; --hl:#E7F0EF;
+  --ok:#3E8E5A; --ok-bg:#E9F3EC; --warn:#C05B2E; --warn-bg:#F8ECE5;
+  --shadow:0 1px 3px rgba(32,48,45,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121B19; --card:#1B2624; --ink:#E5ECEA; --sub:#98A7A3; --line:#2D3B38;
+    --accent:#4FB3AA; --accent-ink:#0D1716; --hl:#22312E;
+    --ok:#6FBF8B; --ok-bg:#1E2F26; --warn:#E08A5F; --warn-bg:#33261E;
+    --shadow:0 1px 3px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="light"]{
+  --bg:#F2F5F4; --card:#FFFFFF; --ink:#20302D; --sub:#5F6E6A; --line:#DBE3E1;
+  --accent:#12706B; --accent-ink:#FFFFFF; --hl:#E7F0EF;
+  --ok:#3E8E5A; --ok-bg:#E9F3EC; --warn:#C05B2E; --warn-bg:#F8ECE5;
+  --shadow:0 1px 3px rgba(32,48,45,.08);
+}
+:root[data-theme="dark"]{
+  --bg:#121B19; --card:#1B2624; --ink:#E5ECEA; --sub:#98A7A3; --line:#2D3B38;
+  --accent:#4FB3AA; --accent-ink:#0D1716; --hl:#22312E;
+  --ok:#6FBF8B; --ok-bg:#1E2F26; --warn:#E08A5F; --warn-bg:#33261E;
+  --shadow:0 1px 3px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Noto Sans JP",Meiryo,sans-serif;
+  line-height:1.7; -webkit-font-smoothing:antialiased;
+}
+#wrap{max-width:640px;margin:0 auto;padding:16px 16px 64px}
+header.appbar{display:flex;align-items:baseline;gap:10px;padding:8px 2px 14px}
+.brand{font-weight:800;font-size:1.05rem;letter-spacing:.02em;color:var(--accent)}
+.brand small{color:var(--sub);font-weight:600;margin-left:8px;letter-spacing:.06em}
+.journey{display:flex;align-items:center;gap:0;margin:0 2px 18px}
+.jstop{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto}
+.jdot{width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--line)}
+.jstop.done .jdot{background:var(--accent);border-color:var(--accent)}
+.jstop.now .jdot{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 3px var(--hl)}
+.jlabel{font-size:.62rem;color:var(--sub);letter-spacing:.04em;white-space:nowrap}
+.jstop.now .jlabel{color:var(--accent);font-weight:700}
+.jline{flex:1 1 auto;height:2px;background:var(--line);margin:0 2px;position:relative;top:-9px}
+.jline.done{background:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:14px}
+h1{font-size:1.35rem;line-height:1.4;margin:0 0 10px;text-wrap:balance}
+h2{font-size:1.05rem;margin:0 0 8px}
+p{margin:0 0 12px}
+.sub{color:var(--sub);font-size:.88rem}
+.eyebrow{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.12em;color:var(--accent);background:var(--hl);border-radius:999px;padding:2px 10px;margin-bottom:10px}
+.counter{font-size:.78rem;color:var(--sub);font-variant-numeric:tabular-nums;margin-bottom:6px}
+.prompt-en{font-size:1.5rem;font-weight:700;letter-spacing:.01em;margin:6px 0 4px;font-family:Georgia,"Times New Roman",serif}
+.prompt-ja{font-size:1.3rem;font-weight:700;margin:6px 0 4px;line-height:1.5}
+button{
+  font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);
+  border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;width:100%;
+  transition:border-color .12s, background .12s;
+}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+button:active{background:var(--hl)}
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;text-align:center}
+.btn-ghost{background:transparent;text-align:center;color:var(--sub)}
+.btn-row{display:flex;gap:10px;margin-top:12px}
+.btn-row button{flex:1;text-align:center}
+.choice.correct{border-color:var(--ok);background:var(--ok-bg)}
+.choice.wrong{border-color:var(--warn);background:var(--warn-bg)}
+.feedback{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:.92rem}
+.feedback.good{background:var(--ok-bg);color:var(--ok);font-weight:700}
+.feedback.bad{background:var(--warn-bg)}
+.feedback.bad b{color:var(--warn)}
+input[type=text]{
+  font:inherit;width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;
+  background:var(--bg);color:var(--ink);font-size:1.05rem;
+}
+input[type=text]:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.timer{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--sub);margin-top:4px}
+.model-answer{background:var(--hl);border-radius:10px;padding:12px 14px;margin-top:12px}
+.model-answer .en{font-size:1.15rem;font-weight:700;font-family:Georgia,serif}
+.model-answer .alt{font-size:.85rem;color:var(--sub);margin-top:2px}
+.play-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;font-size:1.05rem;padding:16px}
+.play-btn[disabled]{opacity:.45;cursor:default}
+.speedtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 8px;margin-bottom:8px;font-variant-numeric:tabular-nums}
+ul.plain{padding-left:1.3em;margin:0 0 12px}
+ul.plain li{margin-bottom:6px}
+.result-grid{display:flex;flex-direction:column;gap:10px}
+.stat{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px dashed var(--line);padding:8px 0}
+.stat:last-child{border-bottom:none}
+.stat .k{font-size:.9rem}
+.stat .v{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+textarea.code{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.72rem;line-height:1.5;
+  width:100%;height:120px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--sub);padding:10px;
+}
+.tagchip{display:inline-block;background:var(--warn-bg);color:var(--warn);border-radius:999px;font-size:.78rem;font-weight:700;padding:2px 10px;margin:2px 4px 2px 0}
+.stamp{display:inline-block;border:2.5px solid var(--accent);color:var(--accent);border-radius:10px;padding:4px 14px;font-weight:800;letter-spacing:.1em;transform:rotate(-3deg);margin:6px 0 10px}
+@media (prefers-reduced-motion: no-preference){
+  .card{animation:rise .25s ease-out}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header class="appbar">
+    <span class="brand">TABIGO<small>旅英語 実力診断</small></span>
+  </header>
+  <nav id="journey" class="journey" aria-label="診断の進行状況"></nav>
+  <main id="app"></main>
+</div>
+
+<script>
+"use strict";
+
+/* ================= 出題データ ================= */
+
+const MEANING = [
+  // band A: 基礎語
+  {b:"A", en:"crowded",  ja:"混雑した", ch:["曇った","混雑した","閉まっている","有名な"]},
+  {b:"A", en:"cheap",    ja:"(値段が)安い", ch:["高い","近い","(値段が)安い","汚い"]},
+  {b:"A", en:"arrive",   ja:"到着する", ch:["出発する","到着する","予約する","案内する"]},
+  {b:"A", en:"luggage",  ja:"荷物", ch:["切符","通路","両替","荷物"]},
+  {b:"A", en:"recommend",ja:"すすめる", ch:["断る","注文する","すすめる","探す"]},
+  {b:"A", en:"far",      ja:"遠い", ch:["遠い","速い","無料の","珍しい"]},
+  // band B: 中級語
+  {b:"B", en:"destination", ja:"目的地", ch:["出発点","目的地","停留所","国境"]},
+  {b:"B", en:"available",   ja:"利用できる・空いている", ch:["高価な","便利な","利用できる・空いている","人気のある"]},
+  {b:"B", en:"delay",       ja:"遅延・遅れ", ch:["割引","遅延・遅れ","乗り換え","行列"]},
+  {b:"B", en:"refund",      ja:"払い戻し", ch:["領収書","前払い","払い戻し","手数料"]},
+  {b:"B", en:"neighborhood",ja:"近所・地区", ch:["近所・地区","郊外","住民","大通り"]},
+  {b:"B", en:"actually",    ja:"実は・実際は", ch:["ついに","おそらく","実は・実際は","すぐに"]},
+  // band C: 句動詞・熟語
+  {b:"C", en:"get on",   ja:"(電車・バスに)乗る", ch:["(電車・バスを)降りる","(電車・バスに)乗る","乗り換える","間に合う"]},
+  {b:"C", en:"run into", ja:"偶然出会う", ch:["駆け込む","衝突する","偶然出会う","追いかける"]},
+  {b:"C", en:"figure out", ja:"理解する・解決する", ch:["計算を間違える","理解する・解決する","描き出す","見失う"]},
+  {b:"C", en:"hang out", ja:"ぶらぶら過ごす・遊ぶ", ch:["洗濯物を干す","ぶらぶら過ごす・遊ぶ","外出を控える","電話を切る"]},
+  {b:"C", en:"show up",  ja:"現れる・やって来る", ch:["見せびらかす","立ち上がる","現れる・やって来る","目立つ"]},
+  {b:"C", en:"sold out", ja:"売り切れ", ch:["特売中","売り切れ","閉店した","予約制"]},
+  {b:"C", en:"take off", ja:"離陸する・(服を)脱ぐ", ch:["着陸する・(服を)着る","離陸する・(服を)脱ぐ","休憩する","急いで行く"]},
+  {b:"C", en:"drop by",  ja:"立ち寄る", ch:["落とす","通り過ぎる","立ち寄る","降車する"]},
+  {b:"C", en:"get lost", ja:"道に迷う", ch:["負ける","道に迷う","なくし物をする","置いていかれる"]},
+  {b:"C", en:"look forward to", ja:"〜を楽しみにする", ch:["〜を前もって調べる","〜に注意する","〜を楽しみにする","〜を見送る"]},
+  {b:"C", en:"come with", ja:"(料理などに)〜が付いてくる", ch:["〜と一緒に来る","(料理などに)〜が付いてくる","〜に賛成する","〜を持参する"]},
+  {b:"C", en:"check out", ja:"(ホテルを)出る・見てみる", ch:["(ホテルを)出る・見てみる","会計を待つ","調査を頼む","入室する"]},
+];
+
+const RECALL = [
+  {ja:"予約", hint:"ホテルやレストランの", ok:["reservation","booking","reserve","book"]},
+  {ja:"値段", hint:"「〜はいくら?」の〜", ok:["price","cost"]},
+  {ja:"混んでいる", hint:"店や電車が", ok:["crowded","busy"]},
+  {ja:"景色", hint:"部屋からの眺め", ok:["view","scenery"]},
+  {ja:"お会計・伝票", hint:"レストランで最後にもらう", ok:["check","bill"]},
+  {ja:"おつり", hint:"支払いで戻ってくるお金", ok:["change"]},
+  {ja:"道に迷った", hint:"「私は道に迷いました」でも単語でもOK", ok:["lost","get lost","got lost","i'm lost","im lost","i am lost"]},
+  {ja:"〜を試す", hint:"試着する・食べてみる", ok:["try"]},
+  {ja:"空港", hint:"", ok:["airport"]},
+  {ja:"おすすめする", hint:"「何がおすすめ?」の動詞", ok:["recommend"]},
+];
+
+const INSTANT = [
+  {lv:1, ja:"私は東京から来ました。", en:"I'm from Tokyo.", alt:"I come from Tokyo. でもOK"},
+  {lv:1, ja:"これはいくらですか?", en:"How much is this?", alt:""},
+  {lv:1, ja:"トイレはどこですか?", en:"Where is the restroom?", alt:"bathroom / toilet でもOK"},
+  {lv:1, ja:"私は辛い食べ物が好きです。", en:"I like spicy food.", alt:""},
+  {lv:2, ja:"写真を撮ってもらえますか?", en:"Could you take a picture?", alt:"Can you take a photo (for me)? でもOK"},
+  {lv:2, ja:"駅にはどうやって行けばいいですか?", en:"How do I get to the station?", alt:"How can I get to 〜? でもOK"},
+  {lv:2, ja:"明日、ロンドンに行く予定です。", en:"I'm going to London tomorrow.", alt:"I'm going to go to 〜 でもOK"},
+  {lv:2, ja:"ここで写真を撮ってもいいですか?", en:"Can I take pictures here?", alt:"Is it OK to take photos here? でもOK"},
+  {lv:3, ja:"ここに来たのは初めてです。", en:"This is my first time here.", alt:"It's my first time (to come) here. でもOK"},
+  {lv:3, ja:"京都に行ったことはありますか?", en:"Have you ever been to Kyoto?", alt:"ever は無くてもOK"},
+  {lv:3, ja:"何がおすすめですか?", en:"What do you recommend?", alt:""},
+  {lv:3, ja:"今日は日本より暑いですね。", en:"It's hotter than Japan today.", alt:""},
+  {lv:4, ja:"ここには3日間滞在する予定です。", en:"I'm staying here for three days.", alt:"I'm going to stay 〜 でもOK"},
+  {lv:4, ja:"あなたの街で一番好きな場所はどこですか?", en:"What's your favorite place in your city?", alt:"Where is your favorite place 〜? でもOK"},
+];
+
+const LISTEN = [
+  {rate:0.7, text:"Excuse me, is this seat taken?",
+   q:"話しかけてきた人は何を知りたい?", ch:["この席が空いているかどうか","次の駅はどこか","切符を持っているか"], a:0},
+  {rate:0.8, text:"The next train to the airport leaves from platform two.",
+   q:"空港行きの電車はどこから出る?", ch:["3番ホーム","2番ホーム","10番ホーム"], a:1},
+  {rate:0.9, text:"Would you like something to drink before your meal?",
+   q:"店員は何と言った?", ch:["食後にデザートはいかがですか","席を移動してもらえますか","食事の前に飲み物はいかがですか"], a:2},
+  {rate:1.0, text:"Sorry, we're sold out of the chocolate cake today.",
+   q:"店員は何と言った?", ch:["チョコレートケーキは今日は売り切れ","チョコレートケーキは今日は半額","ケーキは持ち帰りのみ"], a:0},
+  {rate:1.1, text:"I've lived here for ten years, so let me know if you need any tips.",
+   q:"この人は何と言っている?", ch:["この街には10日間だけ滞在している","ここに10年住んでいるので、困ったら聞いてね","観光案内所は10時に開く"], a:1},
+  {rate:1.2, text:"If you get off at the second stop and turn right, the museum is just around the corner.",
+   q:"美術館への行き方は?", ch:["2つ目の角を左に曲がる","美術館は今日は閉まっている","2つ目の停留所で降りて右に曲がる"], a:2},
+];
+
+const GRAMMAR = [
+  {tag:"経験を聞く", s:"___ you ever been to Osaka?", ch:["Did","Are","Have","Do"], a:2},
+  {tag:"丁寧な依頼", s:"___ you help me with my bag?", ch:["May","Could","Shall","Am"], a:1},
+  {tag:"過去形", s:"I ___ this jacket yesterday.", ch:["buy","buying","have bought","bought"], a:3},
+  {tag:"比較", s:"This one is ___ than that one.", ch:["cheap","cheaper","cheapest","more cheap"], a:1},
+  {tag:"予定を言う", s:"I ___ visit the castle tomorrow.", ch:["am going to","was","have","went to"], a:0},
+  {tag:"所要時間を聞く", s:"How ___ does it take to the airport?", ch:["far","long","much","many"], a:1},
+  {tag:"提案する", s:"Why don't ___ share a taxi?", ch:["us","our","they","we"], a:3},
+  {tag:"場所の前置詞", s:"I'm staying ___ a hotel near the station.", ch:["to","on","at","for"], a:2},
+  {tag:"聞き返す", s:"Sorry, could you say that ___?", ch:["again","more","once","repeat"], a:0},
+  {tag:"want to", s:"I want ___ some souvenirs.", ch:["buy","to buy","buying","bought"], a:1},
+];
+
+/* ================= 状態管理 ================= */
+
+const KEY = "tabigo-diag-v1";
+const STAGES = ["intro","meaning","recall","instant","listening","grammar","result"];
+const STAGE_LABELS = {meaning:"ことば", recall:"ひきだし", instant:"瞬間英作文", listening:"きく", grammar:"文のかたち"};
+
+let S = load() || fresh();
+
+function fresh(){
+  return {
+    stage:"intro", idx:0,
+    meaning:[],            // {en,b,correct}
+    recall:[],             // {ja,input,correct}
+    instant:[],            // {lv,t,r}  r: ok|close|ng|fail
+    listen:[],             // {rate,correct,plays}
+    listenSkipped:false,
+    grammar:[],            // {tag,correct}
+  };
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{ const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+}
+
+/* ================= 描画基盤 ================= */
+
+const app = document.getElementById("app");
+const journeyEl = document.getElementById("journey");
+
+function render(){
+  drawJourney();
+  const fn = {
+    intro: vIntro, meaning: vMeaning, recall: vRecall,
+    instant: vInstant, listening: vListening, grammar: vGrammar, result: vResult,
+  }[S.stage];
+  app.innerHTML = "";
+  fn();
+  save();
+  window.scrollTo(0,0);
+}
+
+function drawJourney(){
+  const order = ["meaning","recall","instant","listening","grammar"];
+  const cur = order.indexOf(S.stage);
+  const doneAll = S.stage === "result";
+  let html = "";
+  order.forEach((st,i)=>{
+    const cls = doneAll || (cur > -1 && i < cur) || (cur === -1 && S.stage!=="intro") ? "done" : (i===cur ? "now" : "");
+    html += `<div class="jstop ${cls}"><span class="jdot"></span><span class="jlabel">${STAGE_LABELS[st]}</span></div>`;
+    if(i < order.length-1){
+      const lineDone = doneAll || (cur > -1 && i < cur);
+      html += `<div class="jline ${lineDone?"done":""}"></div>`;
+    }
+  });
+  journeyEl.innerHTML = html;
+}
+
+function el(html){
+  const t = document.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstChild;
+}
+function card(html){ const c = el(`<section class="card">${html}</section>`); app.appendChild(c); return c; }
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+/* ================= 画面: イントロ ================= */
+
+function vIntro(){
+  const resumable = S.meaning.length || S.recall.length || S.instant.length || S.listen.length || S.grammar.length;
+  const c = card(`
+    <span class="eyebrow">PASSPORT CHECK</span>
+    <h1>出発前に、いまの英語力を測ります</h1>
+    <p class="sub">5つのパート・合計15分ほど。途中でやめても続きから再開できます。結果はこの端末にだけ保存されます。</p>
+    <ul class="plain sub">
+      <li><b>ことば</b> — 単語・熟語の意味がわかるか(選択式)</li>
+      <li><b>ひきだし</b> — 日本語から英単語が出てくるか(入力式)</li>
+      <li><b>瞬間英作文</b> — 短い日本語を英語で言えるか。<b>声を出せる場所</b>がおすすめ</li>
+      <li><b>きく</b> — どの速さまで聞き取れるか。<b>音が出ます</b></li>
+      <li><b>文のかたち</b> — 会話で使う文型の穴さがし(選択式)</li>
+    </ul>
+    <div class="choices"></div>
+  `);
+  const box = c.querySelector(".choices");
+  if(resumable){
+    const b1 = el(`<button class="btn-primary">続きから再開する</button>`);
+    b1.onclick = ()=>{ S.stage = nextIncomplete(); S.idx = curIdx(S.stage); render(); };
+    box.appendChild(b1);
+    const b2 = el(`<button class="btn-ghost">最初からやり直す</button>`);
+    b2.onclick = ()=>{ S = fresh(); S.stage="meaning"; render(); };
+    box.appendChild(b2);
+  } else {
+    const b = el(`<button class="btn-primary">診断をはじめる</button>`);
+    b.onclick = ()=>{ S.stage="meaning"; S.idx=0; render(); };
+    box.appendChild(b);
+  }
+}
+
+function nextIncomplete(){
+  if(S.meaning.length < MEANING.length) return "meaning";
+  if(S.recall.length < RECALL.length) return "recall";
+  if(S.instant.length < INSTANT.length) return "instant";
+  if(!S.listenSkipped && S.listen.length < LISTEN.length) return "listening";
+  if(S.grammar.length < GRAMMAR.length) return "grammar";
+  return "result";
+}
+function curIdx(stage){
+  return {meaning:S.meaning.length, recall:S.recall.length, instant:S.instant.length,
+          listening:S.listen.length, grammar:S.grammar.length}[stage] || 0;
+}
+
+/* ================= 画面: パート1 ことば(意味) ================= */
+
+function vMeaning(){
+  if(S.idx >= MEANING.length){ S.stage="recall"; S.idx=0; render(); return; }
+  const it = MEANING[S.idx];
+  const c = card(`
+    <span class="eyebrow">PART 1 / ことば</span>
+    <div class="counter">${S.idx+1} / ${MEANING.length}</div>
+    <p class="sub" style="margin-bottom:2px">この語の意味は?</p>
+    <div class="prompt-en">${esc(it.en)}</div>
+    <div class="choices"></div>
+  `);
+  const box = c.querySelector(".choices");
+  it.ch.forEach((choice)=>{
+    const b = el(`<button class="choice">${esc(choice)}</button>`);
+    b.onclick = ()=>{
+      const correct = (choice === it.ja);
+      box.querySelectorAll("button").forEach(x=>{
+        x.disabled = true;
+        if(x.textContent === it.ja) x.classList.add("correct");
+      });
+      if(!correct) b.classList.add("wrong");
+      S.meaning.push({en:it.en, b:it.b, correct});
+      save();
+      setTimeout(()=>{ S.idx++; render(); }, correct ? 350 : 1100);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ================= 画面: パート2 ひきだし(想起) ================= */
+
+function normalize(s){
+  return s.toLowerCase().replace(/[.,!?'’"]/g,"").replace(/\s+/g," ").trim();
+}
+function recallMatch(input, oks){
+  const n = normalize(input);
+  if(!n) return false;
+  return oks.some(o=>{
+    const no = normalize(o);
+    return n === no || n.split(" ").join("") === no.split(" ").join("") || n.includes(no);
+  });
+}
+
+function vRecall(){
+  if(S.idx >= RECALL.length){ S.stage="instant"; S.idx=0; render(); return; }
+  const it = RECALL[S.idx];
+  const c = card(`
+    <span class="eyebrow">PART 2 / ひきだし</span>
+    <div class="counter">${S.idx+1} / ${RECALL.length}</div>
+    <p class="sub" style="margin-bottom:2px">英語で何と言う? つづりが少し違っても大丈夫、思い出せるかが大事です。</p>
+    <div class="prompt-ja">「${esc(it.ja)}」</div>
+    ${it.hint ? `<p class="sub">ヒント: ${esc(it.hint)}</p>` : ""}
+    <input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="英語で入力" aria-label="英語で入力">
+    <div class="btn-row">
+      <button class="btn-primary" data-act="answer">回答する</button>
+      <button class="btn-ghost" data-act="giveup">出てこない</button>
+    </div>
+    <div class="fbslot"></div>
+  `);
+  const input = c.querySelector("input");
+  const slot = c.querySelector(".fbslot");
+  setTimeout(()=>input.focus(), 50);
+
+  function finish(gaveUp){
+    const val = input.value;
+    const correct = !gaveUp && recallMatch(val, it.ok);
+    input.disabled = true;
+    c.querySelectorAll(".btn-row button").forEach(b=>b.disabled=true);
+    if(correct){
+      slot.appendChild(el(`<div class="feedback good">◎ ${esc(it.ok[0])} — 出てきました</div>`));
+    } else {
+      slot.appendChild(el(`<div class="feedback bad">答えの例: <b>${esc(it.ok[0])}</b>${it.ok[1]?` / ${esc(it.ok[1])}`:""}</div>`));
+    }
+    S.recall.push({ja:it.ja, input:val, correct});
+    save();
+    setTimeout(()=>{ S.idx++; render(); }, correct ? 700 : 1600);
+  }
+  c.querySelector('[data-act=answer]').onclick = ()=>finish(false);
+  c.querySelector('[data-act=giveup]').onclick = ()=>finish(true);
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); finish(false); } });
+}
+
+/* ================= 画面: パート3 瞬間英作文 ================= */
+
+let instTimerId = null, instT0 = 0;
+
+function vInstant(){
+  if(S.idx >= INSTANT.length){ S.stage="listening"; S.idx=0; render(); return; }
+  const it = INSTANT[S.idx];
+  const c = card(`
+    <span class="eyebrow">PART 3 / 瞬間英作文</span>
+    <div class="counter">${S.idx+1} / ${INSTANT.length}</div>
+    <p class="sub" style="margin-bottom:2px">この日本語を<b>声に出して</b>英語で言ってください(小声・心の中でもOK)。言えたらすぐボタンを押します。</p>
+    <div class="prompt-ja">${esc(it.ja)}</div>
+    <div class="timer" aria-hidden="true">0.0 秒</div>
+    <div class="btn-row">
+      <button class="btn-primary" data-act="said">言えた!</button>
+      <button class="btn-ghost" data-act="fail">出てこなかった</button>
+    </div>
+    <div class="fbslot"></div>
+  `);
+  const timerEl = c.querySelector(".timer");
+  instT0 = performance.now();
+  clearInterval(instTimerId);
+  instTimerId = setInterval(()=>{
+    timerEl.textContent = ((performance.now()-instT0)/1000).toFixed(1) + " 秒";
+  }, 100);
+
+  function reveal(said){
+    clearInterval(instTimerId);
+    const t = (performance.now()-instT0)/1000;
+    c.querySelectorAll(".btn-row button").forEach(b=>b.disabled=true);
+    const slot = c.querySelector(".fbslot");
+    slot.appendChild(el(`
+      <div class="model-answer">
+        <div class="en">${esc(it.en)}</div>
+        ${it.alt ? `<div class="alt">${esc(it.alt)}</div>` : ""}
+      </div>
+    `));
+    if(said){
+      const g = el(`
+        <div class="choices">
+          <p class="sub" style="margin:10px 0 0">自分の答えは合っていましたか?</p>
+          <button data-r="ok">◎ だいたい合ってた</button>
+          <button data-r="close">△ 惜しい(一部違った)</button>
+          <button data-r="ng">✕ けっこう違った</button>
+        </div>`);
+      g.querySelectorAll("button").forEach(b=>{
+        b.onclick = ()=>{
+          S.instant.push({lv:it.lv, t:Math.round(t*10)/10, r:b.dataset.r});
+          S.idx++; render();
+        };
+      });
+      slot.appendChild(g);
+    } else {
+      S.instant.push({lv:it.lv, t:Math.round(t*10)/10, r:"fail"});
+      save();
+      const nb = el(`<div class="choices"><button class="btn-primary">次へ</button></div>`);
+      nb.querySelector("button").onclick = ()=>{ S.idx++; render(); };
+      slot.appendChild(nb);
+    }
+  }
+  c.querySelector('[data-act=said]').onclick = ()=>reveal(true);
+  c.querySelector('[data-act=fail]').onclick = ()=>reveal(false);
+}
+
+/* ================= 画面: パート4 きく ================= */
+
+let voiceCache = null;
+function pickVoice(){
+  if(voiceCache) return voiceCache;
+  const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  const en = vs.filter(v=>v.lang && v.lang.toLowerCase().startsWith("en"));
+  voiceCache = en.find(v=>v.lang==="en-US") || en.find(v=>v.lang==="en-GB") || en[0] || null;
+  return voiceCache;
+}
+if(window.speechSynthesis){
+  speechSynthesis.onvoiceschanged = ()=>{ voiceCache = null; pickVoice(); };
+}
+
+function speak(text, rate, onend){
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice();
+  if(v) u.voice = v;
+  u.lang = v ? v.lang : "en-US";
+  u.rate = rate;
+  u.onend = onend || null;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+function vListening(){
+  if(S.listenSkipped || S.idx >= LISTEN.length){ S.stage="grammar"; S.idx=0; render(); return; }
+  const it = LISTEN[S.idx];
+  let plays = 0;
+  const MAXPLAY = 3;
+  const c = card(`
+    <span class="eyebrow">PART 4 / きく</span>
+    <div class="counter">${S.idx+1} / ${LISTEN.length}</div>
+    <span class="speedtag">SPEED ${it.rate.toFixed(1)}x</span>
+    <p class="sub" style="margin-bottom:8px">音声を聞いて、内容に合うものを選んでください(${MAXPLAY}回まで再生できます)。</p>
+    <button class="play-btn">▶ 音声を再生する(あと${MAXPLAY}回)</button>
+    <div class="choices"></div>
+    <div class="btn-row"><button class="btn-ghost" data-act="novoice">音が出ない / この端末では聞けない</button></div>
+  `);
+  const playBtn = c.querySelector(".play-btn");
+  playBtn.onclick = ()=>{
+    if(plays >= MAXPLAY) return;
+    plays++;
+    playBtn.textContent = plays >= MAXPLAY ? "▶ 再生回数を使い切りました" : `▶ 音声を再生する(あと${MAXPLAY-plays}回)`;
+    if(plays >= MAXPLAY) playBtn.disabled = true;
+    speak(it.text, it.rate);
+  };
+  const box = c.querySelector(".choices");
+  it.ch.forEach((choice,i)=>{
+    const b = el(`<button class="choice">${esc(choice)}</button>`);
+    b.onclick = ()=>{
+      if(plays === 0){ speak(it.text, it.rate); plays=1; return; } // 未再生ならまず再生
+      const correct = (i === it.a);
+      box.querySelectorAll("button").forEach((x,xi)=>{ x.disabled=true; if(xi===it.a) x.classList.add("correct"); });
+      if(!correct) b.classList.add("wrong");
+      S.listen.push({rate:it.rate, correct, plays});
+      save();
+      setTimeout(()=>{ S.idx++; render(); }, correct ? 400 : 1200);
+    };
+    box.appendChild(b);
+  });
+  c.querySelector('[data-act=novoice]').onclick = ()=>{
+    S.listenSkipped = true; S.stage="grammar"; S.idx=0; render();
+  };
+}
+
+/* ================= 画面: パート5 文のかたち ================= */
+
+function vGrammar(){
+  if(S.idx >= GRAMMAR.length){ S.stage="result"; render(); return; }
+  const it = GRAMMAR[S.idx];
+  const c = card(`
+    <span class="eyebrow">PART 5 / 文のかたち</span>
+    <div class="counter">${S.idx+1} / ${GRAMMAR.length}</div>
+    <p class="sub" style="margin-bottom:2px">空所に入るものは?</p>
+    <div class="prompt-en" style="font-size:1.25rem">${esc(it.s)}</div>
+    <div class="choices"></div>
+  `);
+  const box = c.querySelector(".choices");
+  it.ch.forEach((choice,i)=>{
+    const b = el(`<button class="choice">${esc(choice)}</button>`);
+    b.onclick = ()=>{
+      const correct = (i === it.a);
+      box.querySelectorAll("button").forEach((x,xi)=>{ x.disabled=true; if(xi===it.a) x.classList.add("correct"); });
+      if(!correct) b.classList.add("wrong");
+      S.grammar.push({tag:it.tag, correct});
+      save();
+      setTimeout(()=>{ S.idx++; render(); }, correct ? 350 : 1100);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* ================= 画面: 結果 ================= */
+
+function pct(c,t){ return t ? Math.round(c/t*100) : 0; }
+
+function buildResult(){
+  const band = b => {
+    const xs = S.meaning.filter(m=>m.b===b);
+    return [xs.filter(m=>m.correct).length, xs.length];
+  };
+  const missedWords = S.meaning.filter(m=>!m.correct).map(m=>m.en);
+  const recallOk = S.recall.filter(r=>r.correct).length;
+  const recallMissed = S.recall.filter(r=>!r.correct).map(r=>r.ja);
+  const lvStats = {};
+  [1,2,3,4].forEach(lv=>{
+    const xs = S.instant.filter(i=>i.lv===lv);
+    if(!xs.length) return;
+    const okc = xs.filter(i=>i.r==="ok").length;
+    const closec = xs.filter(i=>i.r==="close").length;
+    const times = xs.filter(i=>i.r!=="fail").map(i=>i.t).sort((a,b)=>a-b);
+    const med = times.length ? times[Math.floor(times.length/2)] : null;
+    lvStats[lv] = {ok:okc, close:closec, total:xs.length, medSec:med};
+  });
+  const listenOkRates = S.listen.filter(l=>l.correct).map(l=>l.rate);
+  const listenNgRates = S.listen.filter(l=>!l.correct).map(l=>l.rate);
+  const gOk = S.grammar.filter(g=>g.correct).length;
+  const gMissed = S.grammar.filter(g=>!g.correct).map(g=>g.tag);
+  return {
+    v:1,
+    meaning:{A:band("A"), B:band("B"), C:band("C"), missed:missedWords},
+    recall:{score:[recallOk, S.recall.length], missed:recallMissed},
+    instant:lvStats,
+    listen:{ok:listenOkRates, ng:listenNgRates, skipped:S.listenSkipped,
+            replays:S.listen.reduce((s,l)=>s+l.plays,0)},
+    grammar:{score:[gOk, S.grammar.length], missed:gMissed},
+  };
+}
+
+function vResult(){
+  const R = buildResult();
+  const [a1,a2] = R.meaning.A, [b1,b2] = R.meaning.B, [c1,c2] = R.meaning.C;
+  const [r1,r2] = R.recall.score, [g1,g2] = R.grammar.score;
+  const maxRate = R.listen.ok.length ? Math.max(...R.listen.ok) : 0;
+
+  card(`
+    <span class="eyebrow">ARRIVAL</span>
+    <div class="stamp">診断完了</div>
+    <h1>おつかれさまでした</h1>
+    <p class="sub">これがあなたの現在地です。下の「結果コード」をコピーして、Claudeとのチャットに貼り付けてください。専用カリキュラムを作ります。</p>
+  `);
+
+  const sec1 = card(`
+    <h2>ことば(意味がわかるか)</h2>
+    <div class="result-grid">
+      <div><div class="stat"><span class="k">基礎の単語</span><span class="v">${a1} / ${a2}</span></div><div class="bar"><i style="width:${pct(a1,a2)}%"></i></div></div>
+      <div><div class="stat"><span class="k">中級の単語</span><span class="v">${b1} / ${b2}</span></div><div class="bar"><i style="width:${pct(b1,b2)}%"></i></div></div>
+      <div><div class="stat"><span class="k">句動詞・熟語</span><span class="v">${c1} / ${c2}</span></div><div class="bar"><i style="width:${pct(c1,c2)}%"></i></div></div>
+    </div>
+    ${R.meaning.missed.length ? `<p class="sub" style="margin-top:10px">迷った語: ${R.meaning.missed.map(esc).join(", ")}</p>` : ""}
+  `);
+
+  card(`
+    <h2>ひきだし(英語が出てくるか)</h2>
+    <div><div class="stat"><span class="k">日本語 → 英語</span><span class="v">${r1} / ${r2}</span></div><div class="bar"><i style="width:${pct(r1,r2)}%"></i></div></div>
+    ${R.recall.missed.length ? `<p class="sub" style="margin-top:10px">出てこなかった: ${R.recall.missed.map(esc).join("、")}</p>` : ""}
+  `);
+
+  const lvName = {1:"基本の文(中1相当)",2:"お願い・予定(中2相当)",3:"経験・比較(中3相当)",4:"雑談の文(応用)"};
+  let instHtml = "";
+  Object.keys(R.instant).forEach(lv=>{
+    const st = R.instant[lv];
+    const good = st.ok + st.close;
+    instHtml += `<div><div class="stat"><span class="k">${lvName[lv]}</span><span class="v">${good} / ${st.total}${st.medSec!=null?` ・ ${st.medSec.toFixed(1)}秒`:""}</span></div><div class="bar"><i style="width:${pct(good,st.total)}%"></i></div></div>`;
+  });
+  card(`
+    <h2>瞬間英作文(言えるか・何秒で)</h2>
+    <div class="result-grid">${instHtml}</div>
+    <p class="sub" style="margin-top:10px">秒数は「言えた」までの中央値。会話では3秒以内が目安です。</p>
+  `);
+
+  card(`
+    <h2>きく(ついていける速さ)</h2>
+    ${R.listen.skipped
+      ? `<p class="sub">この端末では音声が再生できなかったため、スキップしました。</p>`
+      : `<div class="stat"><span class="k">正解できた最高速度</span><span class="v">${maxRate ? maxRate.toFixed(1)+"x" : "—"}</span></div>
+         <p class="sub">1.0x がネイティブのゆっくりめの自然速度です。${R.listen.ng.length?`聞き取れなかった速度: ${R.listen.ng.map(r=>r.toFixed(1)+"x").join(", ")}`:"全問正解でした。"}</p>`}
+  `);
+
+  card(`
+    <h2>文のかたち</h2>
+    <div><div class="stat"><span class="k">会話で使う文型</span><span class="v">${g1} / ${g2}</span></div><div class="bar"><i style="width:${pct(g1,g2)}%"></i></div></div>
+    ${R.grammar.missed.length ? `<p style="margin-top:10px">${R.grammar.missed.map(t=>`<span class="tagchip">${esc(t)}</span>`).join("")}</p>` : `<p class="sub" style="margin-top:10px">大きな穴はありません。</p>`}
+  `);
+
+  const code = JSON.stringify(R);
+  const cc = card(`
+    <h2>結果コード</h2>
+    <p class="sub">これをコピーして、チャットに貼り付けてください。</p>
+    <textarea class="code" readonly>${esc(code)}</textarea>
+    <div class="choices">
+      <button class="btn-primary" data-act="copy">結果コードをコピー</button>
+      <button class="btn-ghost" data-act="redo">最初からやり直す</button>
+    </div>
+  `);
+  const ta = cc.querySelector("textarea");
+  cc.querySelector('[data-act=copy]').onclick = (e)=>{
+    ta.select(); ta.setSelectionRange(0, 99999);
+    const done = ()=>{ e.target.textContent = "コピーしました ✓"; };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(code).then(done, ()=>{ document.execCommand("copy"); done(); });
+    } else { document.execCommand("copy"); done(); }
+  };
+  cc.querySelector('[data-act=redo]').onclick = ()=>{
+    if(confirm("結果を消して最初からやり直しますか?")){ S = fresh(); render(); }
+  };
+}
+
+/* ================= 起動 ================= */
+render();
+</script>
+</body>
+</html>

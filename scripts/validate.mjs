@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * タビゴ教材データ検証スクリプト
- * 使い方: node scripts/validate.mjs train.html
+ * 使い方: node scripts/validate.mjs index.html
  * ERROR が1件でもあれば exit 1(公開・コミット禁止)。WARN は判断材料。
  */
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 
-const file = process.argv[2] || "train.html";
+const file = process.argv[2] || "index.html";
 const src = readFileSync(file, "utf-8");
 const errors = [];
 const warns = [];

@@ -12,7 +12,7 @@
    - 教材の追加 → `docs/add_content.md` を読み、一字一句その手順で
    - アプリの修正 → `docs/modify_app.md` を読み、一字一句その手順で
    - 月1ロールプレイ → `docs/roleplay.md` を読み、その形式で実施
-2. **検証を通ってから次へ進む。** `node scripts/validate.mjs train.html` の ERROR が
+2. **検証を通ってから次へ進む。** `node scripts/validate.mjs index.html` の ERROR が
    0件になるまで、公開・コミット・報告に進まない
 3. **ユーザーの学習データを壊さない。** localStorage のキー名とデータ構造
    (`docs/modify_app.md` の不可侵リスト)を変更しない。変更が避けられない場合は
@@ -20,18 +20,24 @@
 4. **設計原則に反する変更をしない。** 特に: 日数カウント(ストリーク)の導入、
    固定ノルマ、サボりへのペナルティ、可変時間メニュー(3/10/20分)の廃止は禁止。
    迷ったら勝手に進めず、ユーザーに日本語で選択肢を示して聞く
-5. **アプリ更新は必ず同じArtifact URLに再公開する。** URLが変わるとユーザーの
-   ホーム画面のアイコンが死ぬ。別の会話からの更新は Artifact ツールに `url` を渡す
+5. **ユーザーの学習データが消える公開方法をとらない。** 本番はGitHub Pages
+   (固定URL・保存が永続する)。公開手順は docs/modify_app.md の「公開手順」に従う
 
-## 成果物のURL(変更禁止・再公開時はこのURLを指定)
+## ホスティングと成果物(重要)
 
-- トレーニングアプリ(毎日使う本体): https://claude.ai/code/artifact/6533c3e5-f636-40c5-b872-9a42814c1903
-  - ソース: `train.html`
-- 実力診断テスト: https://claude.ai/code/artifact/41ec39d4-2373-4c0f-9591-a7e61b3e320a
-  - ソース: `index.html`
+**本番(正)**: GitHub Pages — tabigo リポジトリの main にプッシュすると
+`https://mbiz2026.github.io/tabigo/` に配信される(Pages有効化後)。
+- `index.html` = トレーニングアプリ本体(毎日使う。旧名 train.html)
+- `diagnose.html` = 実力診断テスト
+- `sw.js` = オフライン対応(**更新時は中の CACHE バージョン番号を必ず上げる**)
+- `manifest.webmanifest` = ホーム画面アプリ化
 
-Artifactは`<body>`の中身だけを書く形式(doctype/html/head/bodyタグなし、`<title>`はあり)。
-リポジトリ版は完全なHTML。**中身は同一に保つこと**(片方だけ直すのは禁止)。
+**旧(暫定・廃止予定)**: Claude Artifact
+- トレーニング: https://claude.ai/code/artifact/6533c3e5-f636-40c5-b872-9a42814c1903
+- 診断: https://claude.ai/code/artifact/41ec39d4-2373-4c0f-9591-a7e61b3e320a
+- Artifact表示環境はブラウザ保存領域が消えることがあると実地で判明済み。
+  Pages移行が完了したらArtifactの更新は不要。移行前に更新する場合のみ、
+  同じURLに再公開(`url`指定)し、body専用形式(doctype/head/bodyなし)で書く
 
 ## ユーザープロフィール(2026-07-11 診断)
 

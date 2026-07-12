@@ -3,12 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>タビゴ | 旅英語 実力診断</title>
+<meta name="theme-color" content="#12706B">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>タビゴ | 旅英語トレーニング</title>
 <style>
 :root{
   --bg:#F2F5F4; --card:#FFFFFF; --ink:#20302D; --sub:#5F6E6A; --line:#DBE3E1;
   --accent:#12706B; --accent-ink:#FFFFFF; --hl:#E7F0EF;
   --ok:#3E8E5A; --ok-bg:#E9F3EC; --warn:#C05B2E; --warn-bg:#F8ECE5;
+  --gold:#B8860B; --gold-bg:#F7F0DC;
   --shadow:0 1px 3px rgba(32,48,45,.08);
 }
 @media (prefers-color-scheme: dark){
@@ -16,6 +19,7 @@
     --bg:#121B19; --card:#1B2624; --ink:#E5ECEA; --sub:#98A7A3; --line:#2D3B38;
     --accent:#4FB3AA; --accent-ink:#0D1716; --hl:#22312E;
     --ok:#6FBF8B; --ok-bg:#1E2F26; --warn:#E08A5F; --warn-bg:#33261E;
+    --gold:#D9B44A; --gold-bg:#2E2A1B;
     --shadow:0 1px 3px rgba(0,0,0,.35);
   }
 }
@@ -23,12 +27,14 @@
   --bg:#F2F5F4; --card:#FFFFFF; --ink:#20302D; --sub:#5F6E6A; --line:#DBE3E1;
   --accent:#12706B; --accent-ink:#FFFFFF; --hl:#E7F0EF;
   --ok:#3E8E5A; --ok-bg:#E9F3EC; --warn:#C05B2E; --warn-bg:#F8ECE5;
+  --gold:#B8860B; --gold-bg:#F7F0DC;
   --shadow:0 1px 3px rgba(32,48,45,.08);
 }
 :root[data-theme="dark"]{
   --bg:#121B19; --card:#1B2624; --ink:#E5ECEA; --sub:#98A7A3; --line:#2D3B38;
   --accent:#4FB3AA; --accent-ink:#0D1716; --hl:#22312E;
   --ok:#6FBF8B; --ok-bg:#1E2F26; --warn:#E08A5F; --warn-bg:#33261E;
+  --gold:#D9B44A; --gold-bg:#2E2A1B;
   --shadow:0 1px 3px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
@@ -39,27 +45,19 @@ body{
   line-height:1.7; -webkit-font-smoothing:antialiased;
 }
 #wrap{max-width:640px;margin:0 auto;padding:16px 16px 64px}
-header.appbar{display:flex;align-items:baseline;gap:10px;padding:8px 2px 14px}
+header.appbar{display:flex;align-items:center;justify-content:space-between;padding:8px 2px 12px}
 .brand{font-weight:800;font-size:1.05rem;letter-spacing:.02em;color:var(--accent)}
 .brand small{color:var(--sub);font-weight:600;margin-left:8px;letter-spacing:.06em}
-.journey{display:flex;align-items:center;gap:0;margin:0 2px 18px}
-.jstop{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto}
-.jdot{width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--line)}
-.jstop.done .jdot{background:var(--accent);border-color:var(--accent)}
-.jstop.now .jdot{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 3px var(--hl)}
-.jlabel{font-size:.62rem;color:var(--sub);letter-spacing:.04em;white-space:nowrap}
-.jstop.now .jlabel{color:var(--accent);font-weight:700}
-.jline{flex:1 1 auto;height:2px;background:var(--line);margin:0 2px;position:relative;top:-9px}
-.jline.done{background:var(--accent)}
+.sessmeta{font-size:.8rem;color:var(--sub);font-variant-numeric:tabular-nums}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:14px}
-h1{font-size:1.35rem;line-height:1.4;margin:0 0 10px;text-wrap:balance}
-h2{font-size:1.05rem;margin:0 0 8px}
+h1{font-size:1.3rem;line-height:1.4;margin:0 0 8px;text-wrap:balance}
+h2{font-size:1.02rem;margin:0 0 8px}
 p{margin:0 0 12px}
 .sub{color:var(--sub);font-size:.88rem}
 .eyebrow{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.12em;color:var(--accent);background:var(--hl);border-radius:999px;padding:2px 10px;margin-bottom:10px}
-.counter{font-size:.78rem;color:var(--sub);font-variant-numeric:tabular-nums;margin-bottom:6px}
-.prompt-en{font-size:1.5rem;font-weight:700;letter-spacing:.01em;margin:6px 0 4px;font-family:Georgia,"Times New Roman",serif}
-.prompt-ja{font-size:1.3rem;font-weight:700;margin:6px 0 4px;line-height:1.5}
+.why{font-size:.78rem;color:var(--sub);background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:4px 10px;display:inline-block;margin-bottom:8px}
+.prompt-en{font-size:1.4rem;font-weight:700;margin:6px 0 4px;font-family:Georgia,"Times New Roman",serif}
+.prompt-ja{font-size:1.25rem;font-weight:700;margin:6px 0 4px;line-height:1.55}
 button{
   font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);
   border-radius:12px;padding:12px 16px;cursor:pointer;text-align:left;width:100%;
@@ -74,39 +72,62 @@ button:active{background:var(--hl)}
 .btn-row button{flex:1;text-align:center}
 .choice.correct{border-color:var(--ok);background:var(--ok-bg)}
 .choice.wrong{border-color:var(--warn);background:var(--warn-bg)}
+.timer{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--sub);margin-top:4px}
+.model-answer{background:var(--hl);border-radius:10px;padding:12px 14px;margin-top:12px}
+.model-answer .en{font-size:1.12rem;font-weight:700;font-family:Georgia,serif}
+.model-answer .alt{font-size:.85rem;color:var(--sub);margin-top:2px}
+.play-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;padding:14px}
+.play-btn.small{padding:8px 12px;font-size:.9rem}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.menu-grid button{text-align:center;padding:16px 8px}
+.menu-grid .m-min{font-size:1.5rem;font-weight:800;display:block;font-variant-numeric:tabular-nums}
+.menu-grid .m-desc{font-size:.72rem;color:var(--sub);display:block;line-height:1.4;margin-top:2px}
+.statrow{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--line);padding:7px 0;gap:12px}
+.statrow:last-child{border-bottom:none}
+.statrow .k{font-size:.88rem}
+.statrow .v{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.big-metric{display:flex;align-items:baseline;gap:8px;margin:2px 0 4px}
+.big-metric .num{font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--accent);line-height:1.1}
+.big-metric .unit{color:var(--sub);font-weight:700}
+.delta{font-size:.85rem;font-weight:700}
+.delta.down{color:var(--ok)}
+.delta.up{color:var(--warn)}
+svg.graph{width:100%;height:150px;display:block}
+.mapline{display:flex;align-items:center;overflow-x:auto;padding:6px 2px;gap:0}
+.mstop{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto;min-width:56px}
+.mdot{width:14px;height:14px;border-radius:50%;background:var(--card);border:2px solid var(--line)}
+.mstop.done .mdot{background:var(--accent);border-color:var(--accent)}
+.mstop.now .mdot{background:var(--card);border-color:var(--accent);box-shadow:0 0 0 3px var(--hl)}
+.mlabel{font-size:.66rem;color:var(--sub);white-space:nowrap}
+.mstop.now .mlabel{color:var(--accent);font-weight:700}
+.mline{flex:0 0 22px;height:2px;background:var(--line);position:relative;top:-9px}
+.mline.done{background:var(--accent)}
+.tagchip{display:inline-block;background:var(--hl);color:var(--accent);border-radius:999px;font-size:.76rem;font-weight:700;padding:2px 10px;margin:2px 4px 2px 0}
+.reward{border:1.5px solid var(--gold);background:var(--gold-bg)}
+.reward .eyebrow{color:var(--gold);background:transparent;border:1px solid var(--gold)}
 .feedback{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:.92rem}
 .feedback.good{background:var(--ok-bg);color:var(--ok);font-weight:700}
 .feedback.bad{background:var(--warn-bg)}
-.feedback.bad b{color:var(--warn)}
+.chunk-ex{margin-top:8px;font-size:.92rem;color:var(--sub)}
+.chunk-ex .en{font-family:Georgia,serif;font-weight:600;color:var(--ink)}
+.shadow-line{display:flex;gap:10px;align-items:center;border-bottom:1px dashed var(--line);padding:10px 0}
+.shadow-line:last-child{border-bottom:none}
+.shadow-line .t{flex:1}
+.shadow-line .en{font-family:Georgia,serif;font-weight:700}
+.shadow-line .ja{font-size:.8rem;color:var(--sub)}
+.shadow-line button{width:auto;flex:0 0 auto}
+.story-text{font-family:Georgia,serif;font-size:1.05rem;line-height:1.9;margin:10px 0}
+.progressbar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:14px}
+.progressbar i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.homefoot{display:flex;gap:14px;justify-content:center;margin-top:6px}
+.homefoot button{width:auto;border:none;background:none;color:var(--sub);font-size:.8rem;padding:4px 8px;text-decoration:underline;cursor:pointer}
 input[type=text]{
   font:inherit;width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;
-  background:var(--bg);color:var(--ink);font-size:1.05rem;
+  background:var(--bg);color:var(--ink);font-size:1rem;
 }
 input[type=text]:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
-.timer{font-variant-numeric:tabular-nums;font-size:.85rem;color:var(--sub);margin-top:4px}
-.model-answer{background:var(--hl);border-radius:10px;padding:12px 14px;margin-top:12px}
-.model-answer .en{font-size:1.15rem;font-weight:700;font-family:Georgia,serif}
-.model-answer .alt{font-size:.85rem;color:var(--sub);margin-top:2px}
-.play-btn{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:700;font-size:1.05rem;padding:16px}
-.play-btn[disabled]{opacity:.45;cursor:default}
-.speedtag{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 8px;margin-bottom:8px;font-variant-numeric:tabular-nums}
-ul.plain{padding-left:1.3em;margin:0 0 12px}
-ul.plain li{margin-bottom:6px}
-.result-grid{display:flex;flex-direction:column;gap:10px}
-.stat{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px dashed var(--line);padding:8px 0}
-.stat:last-child{border-bottom:none}
-.stat .k{font-size:.9rem}
-.stat .v{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
-.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
-.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
-textarea.code{
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.72rem;line-height:1.5;
-  width:100%;height:120px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--sub);padding:10px;
-}
-.tagchip{display:inline-block;background:var(--warn-bg);color:var(--warn);border-radius:999px;font-size:.78rem;font-weight:700;padding:2px 10px;margin:2px 4px 2px 0}
-.stamp{display:inline-block;border:2.5px solid var(--accent);color:var(--accent);border-radius:10px;padding:4px 14px;font-weight:800;letter-spacing:.1em;transform:rotate(-3deg);margin:6px 0 10px}
 @media (prefers-reduced-motion: no-preference){
-  .card{animation:rise .25s ease-out}
+  .card{animation:rise .22s ease-out}
   @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 }
 </style>
@@ -114,364 +135,371 @@ textarea.code{
 <body>
 <div id="wrap">
   <header class="appbar">
-    <span class="brand">TABIGO<small>旅英語 実力診断</small></span>
+    <span class="brand">TABIGO<small>旅英語トレーニング</small></span>
+    <span class="sessmeta" id="meta"></span>
   </header>
-  <nav id="journey" class="journey" aria-label="診断の進行状況"></nav>
   <main id="app"></main>
 </div>
 
 <script>
 "use strict";
 
-/* ================= 出題データ ================= */
+/* =====================================================
+   コンテンツバンク
+===================================================== */
 
-const MEANING = [
-  // band A: 基礎語
-  {b:"A", en:"crowded",  ja:"混雑した", ch:["曇った","混雑した","閉まっている","有名な"]},
-  {b:"A", en:"cheap",    ja:"(値段が)安い", ch:["高い","近い","(値段が)安い","汚い"]},
-  {b:"A", en:"arrive",   ja:"到着する", ch:["出発する","到着する","予約する","案内する"]},
-  {b:"A", en:"luggage",  ja:"荷物", ch:["切符","通路","両替","荷物"]},
-  {b:"A", en:"recommend",ja:"すすめる", ch:["断る","注文する","すすめる","探す"]},
-  {b:"A", en:"far",      ja:"遠い", ch:["遠い","速い","無料の","珍しい"]},
-  // band B: 中級語
-  {b:"B", en:"destination", ja:"目的地", ch:["出発点","目的地","停留所","国境"]},
-  {b:"B", en:"available",   ja:"利用できる・空いている", ch:["高価な","便利な","利用できる・空いている","人気のある"]},
-  {b:"B", en:"delay",       ja:"遅延・遅れ", ch:["割引","遅延・遅れ","乗り換え","行列"]},
-  {b:"B", en:"refund",      ja:"払い戻し", ch:["領収書","前払い","払い戻し","手数料"]},
-  {b:"B", en:"neighborhood",ja:"近所・地区", ch:["近所・地区","郊外","住民","大通り"]},
-  {b:"B", en:"actually",    ja:"実は・実際は", ch:["ついに","おそらく","実は・実際は","すぐに"]},
-  // band C: 句動詞・熟語
-  {b:"C", en:"get on",   ja:"(電車・バスに)乗る", ch:["(電車・バスを)降りる","(電車・バスに)乗る","乗り換える","間に合う"]},
-  {b:"C", en:"run into", ja:"偶然出会う", ch:["駆け込む","衝突する","偶然出会う","追いかける"]},
-  {b:"C", en:"figure out", ja:"理解する・解決する", ch:["計算を間違える","理解する・解決する","描き出す","見失う"]},
-  {b:"C", en:"hang out", ja:"ぶらぶら過ごす・遊ぶ", ch:["洗濯物を干す","ぶらぶら過ごす・遊ぶ","外出を控える","電話を切る"]},
-  {b:"C", en:"show up",  ja:"現れる・やって来る", ch:["見せびらかす","立ち上がる","現れる・やって来る","目立つ"]},
-  {b:"C", en:"sold out", ja:"売り切れ", ch:["特売中","売り切れ","閉店した","予約制"]},
-  {b:"C", en:"take off", ja:"離陸する・(服を)脱ぐ", ch:["着陸する・(服を)着る","離陸する・(服を)脱ぐ","休憩する","急いで行く"]},
-  {b:"C", en:"drop by",  ja:"立ち寄る", ch:["落とす","通り過ぎる","立ち寄る","降車する"]},
-  {b:"C", en:"get lost", ja:"道に迷う", ch:["負ける","道に迷う","なくし物をする","置いていかれる"]},
-  {b:"C", en:"look forward to", ja:"〜を楽しみにする", ch:["〜を前もって調べる","〜に注意する","〜を楽しみにする","〜を見送る"]},
-  {b:"C", en:"come with", ja:"(料理などに)〜が付いてくる", ch:["〜と一緒に来る","(料理などに)〜が付いてくる","〜に賛成する","〜を持参する"]},
-  {b:"C", en:"check out", ja:"(ホテルを)出る・見てみる", ch:["(ホテルを)出る・見てみる","会計を待つ","調査を頼む","入室する"]},
+/* --- 瞬間英作文カード: wk=初出週, lv=1基本/2依頼・予定/3経験・比較/4雑談, q=英語で聞かれる形(モード2用) --- */
+const SENT = [
+ {id:"s01",wk:1,lv:1,ja:"私は日本から来ました。",en:"I'm from Japan.",alt:"",q:"Where are you from?"},
+ {id:"s02",wk:1,lv:1,ja:"水をもらえますか?",en:"Can I have some water?",alt:"Could I have 〜 だとより丁寧",q:"Would you like something to drink?"},
+ {id:"s03",wk:1,lv:2,ja:"観光で来ました。",en:"I'm here for sightseeing.",alt:"I'm here on vacation. でもOK",q:"What brings you here?"},
+ {id:"s04",wk:1,lv:2,ja:"5日間滞在する予定です。",en:"I'm staying for five days.",alt:"I'm going to stay 〜 でもOK",q:"How long are you staying?"},
+ {id:"s05",wk:1,lv:1,ja:"すみません、通ってもいいですか?",en:"Excuse me, can I get through?",alt:"",q:""},
+ {id:"s06",wk:1,lv:3,ja:"海外に来たのは初めてです。",en:"This is my first time abroad.",alt:"It's my first time to travel abroad. でもOK",q:"Have you traveled abroad before?"},
+ {id:"s07",wk:1,lv:2,ja:"ホテルまでどうやって行けばいいですか?",en:"How do I get to the hotel?",alt:"How can I get to 〜? でもOK",q:""},
+ {id:"s08",wk:1,lv:4,ja:"あなたはこの街の出身ですか?",en:"Are you from this city?",alt:"Are you from around here? でもOK",q:""},
+ {id:"s09",wk:1,lv:1,ja:"それはいいですね。",en:"That sounds nice.",alt:"That sounds great. / Nice! でもOK",q:""},
+ {id:"s10",wk:1,lv:3,ja:"長いフライトだったので疲れました。",en:"I'm tired because it was a long flight.",alt:"The flight was long, so I'm tired. でもOK",q:"How was your flight?"},
+ {id:"s11",wk:2,lv:1,ja:"チェックインをお願いします。",en:"I'd like to check in.",alt:"Check-in, please. でもOK",q:""},
+ {id:"s12",wk:2,lv:2,ja:"予約しています。",en:"I have a reservation.",alt:"",q:"Do you have a reservation?"},
+ {id:"s13",wk:2,lv:2,ja:"Wi-Fiのパスワードを教えてもらえますか?",en:"Could you tell me the Wi-Fi password?",alt:"What's the Wi-Fi password? でもOK",q:""},
+ {id:"s14",wk:2,lv:3,ja:"眺めのいい部屋に泊まっています。",en:"I'm staying in a room with a nice view.",alt:"",q:"How's your hotel?"},
+ {id:"s15",wk:2,lv:1,ja:"コーヒーをひとつください。",en:"Can I get a coffee?",alt:"One coffee, please. でもOK",q:"What can I get you?"},
+ {id:"s16",wk:2,lv:2,ja:"ここで食べていきます。",en:"For here, please.",alt:"",q:"For here or to go?"},
+ {id:"s17",wk:2,lv:3,ja:"朝食は何時から始まりますか?",en:"What time does breakfast start?",alt:"",q:""},
+ {id:"s18",wk:2,lv:4,ja:"このあたりでおすすめのカフェはありますか?",en:"Is there a cafe you'd recommend around here?",alt:"Do you know a good cafe near here? でもOK",q:""},
+ {id:"s19",wk:2,lv:1,ja:"とてもおいしいです。",en:"It's really good.",alt:"This is delicious. でもOK",q:"How is it?"},
+ {id:"s20",wk:2,lv:4,ja:"よくここに来るんですか?",en:"Do you come here often?",alt:"",q:""},
+ {id:"s21",wk:3,lv:2,ja:"2人ですが、席はありますか?",en:"Do you have a table for two?",alt:"A table for two, please. でもOK",q:"How many people?"},
+ {id:"s22",wk:3,lv:2,ja:"メニューを見せてもらえますか?",en:"Can I see the menu?",alt:"",q:""},
+ {id:"s23",wk:3,lv:3,ja:"一番人気の料理はどれですか?",en:"Which dish is the most popular?",alt:"What's the most popular dish? でもOK",q:""},
+ {id:"s24",wk:3,lv:2,ja:"これを試してみます。",en:"I'll try this one.",alt:"",q:"Have you decided?"},
+ {id:"s25",wk:3,lv:1,ja:"お会計をお願いします。",en:"Can I have the check?",alt:"Check, please. / the bill(英)でもOK",q:""},
+ {id:"s26",wk:3,lv:3,ja:"カードで払ってもいいですか?",en:"Can I pay by card?",alt:"Do you take card? でもOK",q:"How would you like to pay?"},
+ {id:"s27",wk:3,lv:2,ja:"ちょっと見ているだけです。",en:"I'm just looking.",alt:"Just looking, thanks. でもOK",q:"Can I help you?"},
+ {id:"s28",wk:3,lv:3,ja:"もう少し安いものはありますか?",en:"Do you have anything cheaper?",alt:"",q:""},
+ {id:"s29",wk:3,lv:4,ja:"これは友達へのお土産なんです。",en:"This is a souvenir for my friend.",alt:"",q:"Is this for you?"},
+ {id:"s30",wk:3,lv:1,ja:"これをください。",en:"I'll take this one.",alt:"",q:""},
+ {id:"s31",wk:4,lv:2,ja:"駅はこの道でいいですか?",en:"Is this the right way to the station?",alt:"",q:""},
+ {id:"s32",wk:4,lv:3,ja:"歩いてどのくらいかかりますか?",en:"How long does it take on foot?",alt:"How long does it take to walk there? でもOK",q:""},
+ {id:"s33",wk:4,lv:2,ja:"道に迷ってしまいました。",en:"I got lost.",alt:"I'm lost. でもOK",q:"Are you OK?"},
+ {id:"s34",wk:4,lv:4,ja:"この街は思ったよりずっと大きいですね。",en:"This city is much bigger than I expected.",alt:"",q:"What do you think of the city?"},
+ {id:"s35",wk:4,lv:3,ja:"東京に行ったことはありますか?",en:"Have you ever been to Tokyo?",alt:"ever は無くてもOK",q:""},
+ {id:"s36",wk:4,lv:4,ja:"日本に来ることがあったら、案内しますよ。",en:"If you ever come to Japan, I'll show you around.",alt:"",q:""},
+ {id:"s37",wk:4,lv:1,ja:"もう一度言ってもらえますか?",en:"Could you say that again?",alt:"Sorry? だけでも通じます",q:""},
+ {id:"s38",wk:4,lv:2,ja:"写真を撮りましょうか?",en:"Shall I take a picture for you?",alt:"Do you want me to take a picture? でもOK",q:""},
+ {id:"s39",wk:4,lv:3,ja:"趣味は写真を撮ることです。",en:"My hobby is taking pictures.",alt:"I like taking pictures. の方が会話では自然",q:"What do you do in your free time?"},
+ {id:"s40",wk:4,lv:4,ja:"ここでの暮らしはどうですか?",en:"How do you like living here?",alt:"",q:""},
 ];
 
-const RECALL = [
-  {ja:"予約", hint:"ホテルやレストランの", ok:["reservation","booking","reserve","book"]},
-  {ja:"値段", hint:"「〜はいくら?」の〜", ok:["price","cost"]},
-  {ja:"混んでいる", hint:"店や電車が", ok:["crowded","busy"]},
-  {ja:"景色", hint:"部屋からの眺め", ok:["view","scenery"]},
-  {ja:"お会計・伝票", hint:"レストランで最後にもらう", ok:["check","bill"]},
-  {ja:"おつり", hint:"支払いで戻ってくるお金", ok:["change"]},
-  {ja:"道に迷った", hint:"「私は道に迷いました」でも単語でもOK", ok:["lost","get lost","got lost","i'm lost","im lost","i am lost"]},
-  {ja:"〜を試す", hint:"試着する・食べてみる", ok:["try"]},
-  {ja:"空港", hint:"", ok:["airport"]},
-  {ja:"おすすめする", hint:"「何がおすすめ?」の動詞", ok:["recommend"]},
+/* --- チャンクカード: kind=phr句動詞/word旅行語/talk雑談, pri=診断で落とした最優先 --- */
+const CHUNK = [
+ {id:"c01",kind:"phr",pri:1,en:"run into 〜",ja:"〜に偶然出会う",ex:"I ran into an old friend at the market.",exJa:"市場で旧友にばったり会った"},
+ {id:"c02",kind:"phr",pri:1,en:"figure out 〜",ja:"〜を理解する・解決する",ex:"I can't figure out this ticket machine.",exJa:"この券売機の使い方がわからない"},
+ {id:"c03",kind:"phr",pri:0,en:"check out 〜",ja:"(ホテルを)出る/〜を見てみる",ex:"You should check out the night market.",exJa:"夜市、行ってみるといいよ"},
+ {id:"c04",kind:"phr",pri:0,en:"get on / get off",ja:"(乗り物に)乗る/降りる",ex:"Get off at the second stop.",exJa:"2つ目の停留所で降りて"},
+ {id:"c05",kind:"phr",pri:0,en:"look for 〜",ja:"〜を探す",ex:"I'm looking for the bus stop.",exJa:"バス停を探しています"},
+ {id:"c06",kind:"phr",pri:0,en:"pick up 〜",ja:"〜を受け取る・迎えに行く",ex:"Where can I pick up my ticket?",exJa:"チケットはどこで受け取れますか"},
+ {id:"c07",kind:"phr",pri:0,en:"try on 〜",ja:"〜を試着する",ex:"Can I try this on?",exJa:"これ、試着してもいいですか"},
+ {id:"c08",kind:"phr",pri:0,en:"hang out",ja:"ぶらぶら過ごす・遊ぶ",ex:"We hung out by the beach all day.",exJa:"一日中ビーチでのんびりした"},
+ {id:"c09",kind:"phr",pri:0,en:"show up",ja:"現れる・やって来る",ex:"The bus didn't show up for twenty minutes.",exJa:"バスが20分も来なかった"},
+ {id:"c10",kind:"phr",pri:0,en:"drop by",ja:"立ち寄る",ex:"Drop by anytime.",exJa:"いつでも寄ってね"},
+ {id:"c11",kind:"phr",pri:0,en:"look forward to 〜",ja:"〜を楽しみにする",ex:"I'm looking forward to the trip.",exJa:"旅行を楽しみにしています"},
+ {id:"c12",kind:"phr",pri:0,en:"come with 〜",ja:"(料理に)〜が付いてくる",ex:"Does it come with fries?",exJa:"それ、ポテトは付いてきますか"},
+ {id:"c13",kind:"word",pri:1,en:"refund",ja:"払い戻し",ex:"Can I get a refund?",exJa:"払い戻しはできますか"},
+ {id:"c14",kind:"word",pri:1,en:"destination",ja:"目的地",ex:"What's your final destination?",exJa:"最終目的地はどちらですか"},
+ {id:"c15",kind:"word",pri:1,en:"neighborhood",ja:"近所・地区",ex:"This is a quiet neighborhood.",exJa:"ここは静かな地区です"},
+ {id:"c16",kind:"word",pri:1,en:"view",ja:"景色・眺め",ex:"I'd like a room with a view.",exJa:"眺めのいい部屋がいいです"},
+ {id:"c17",kind:"word",pri:1,en:"the check / the bill",ja:"お会計・伝票",ex:"Can I have the check?",exJa:"お会計をお願いします"},
+ {id:"c18",kind:"word",pri:1,en:"change",ja:"おつり・小銭",ex:"Keep the change.",exJa:"おつりは取っておいてください"},
+ {id:"c19",kind:"word",pri:0,en:"crowded",ja:"混んでいる",ex:"It gets crowded at night.",exJa:"夜は混んできます"},
+ {id:"c20",kind:"word",pri:0,en:"available",ja:"空いている・利用できる",ex:"Is this seat available?",exJa:"この席、空いていますか"},
+ {id:"c21",kind:"word",pri:0,en:"delay",ja:"遅れ・遅延",ex:"The flight was delayed.",exJa:"フライトが遅れた"},
+ {id:"c22",kind:"word",pri:0,en:"charge",ja:"料金・請求",ex:"Is there an extra charge?",exJa:"追加料金はかかりますか"},
+ {id:"c23",kind:"word",pri:0,en:"receipt",ja:"レシート・領収書",ex:"Can I have a receipt?",exJa:"レシートをもらえますか"},
+ {id:"c24",kind:"word",pri:0,en:"direction",ja:"方向・道順",ex:"We went in the wrong direction.",exJa:"逆方向に行ってしまった"},
+ {id:"c25",kind:"talk",pri:0,en:"It depends.",ja:"場合によるね",ex:"It depends on the weather.",exJa:"天気次第かな"},
+ {id:"c26",kind:"talk",pri:0,en:"How about you?",ja:"あなたはどう?",ex:"I love it here. How about you?",exJa:"ここ最高だね。君は?"},
+ {id:"c27",kind:"talk",pri:0,en:"I've heard (that) 〜",ja:"〜と聞いたことがある",ex:"I've heard the old town is beautiful.",exJa:"旧市街がきれいだと聞きました"},
+ {id:"c28",kind:"talk",pri:0,en:"kind of",ja:"まあまあ・ちょっと",ex:"I'm kind of tired.",exJa:"ちょっと疲れたかも"},
+ {id:"c29",kind:"talk",pri:0,en:"What do you mean?",ja:"どういう意味?",ex:"Wait, what do you mean?",exJa:"待って、どういうこと?"},
+ {id:"c30",kind:"talk",pri:0,en:"That's why 〜",ja:"だから〜なんだ",ex:"That's why it's so crowded.",exJa:"だからこんなに混んでるのか"},
+ {id:"c31",kind:"talk",pri:0,en:"I was wondering if 〜",ja:"〜してもらえないかと思って",ex:"I was wondering if you could help me.",exJa:"手伝ってもらえないかと思って"},
+ {id:"c32",kind:"talk",pri:0,en:"actually",ja:"実は",ex:"Actually, this is my first time here.",exJa:"実はここ、初めてなんです"},
+ {id:"c33",kind:"talk",pri:0,en:"to be honest",ja:"正直に言うと",ex:"To be honest, I'm a little lost.",exJa:"正直、ちょっと迷ってます"},
+ {id:"c34",kind:"talk",pri:0,en:"anyway",ja:"とにかく・それはそうと",ex:"Anyway, let's get going.",exJa:"さて、そろそろ行こうか"},
+ {id:"c35",kind:"talk",pri:0,en:"I guess so.",ja:"たぶんね・そうかもね",ex:"\"Is it far?\" \"I guess so.\"",exJa:"「遠い?」「たぶんね」"},
+ {id:"c36",kind:"talk",pri:0,en:"Sounds good.",ja:"いいね・それでOK",ex:"\"Pizza tonight?\" \"Sounds good.\"",exJa:"「今夜ピザは?」「いいね」"},
 ];
 
-const INSTANT = [
-  {lv:1, ja:"私は東京から来ました。", en:"I'm from Tokyo.", alt:"I come from Tokyo. でもOK"},
-  {lv:1, ja:"これはいくらですか?", en:"How much is this?", alt:""},
-  {lv:1, ja:"トイレはどこですか?", en:"Where is the restroom?", alt:"bathroom / toilet でもOK"},
-  {lv:1, ja:"私は辛い食べ物が好きです。", en:"I like spicy food.", alt:""},
-  {lv:2, ja:"写真を撮ってもらえますか?", en:"Could you take a picture?", alt:"Can you take a photo (for me)? でもOK"},
-  {lv:2, ja:"駅にはどうやって行けばいいですか?", en:"How do I get to the station?", alt:"How can I get to 〜? でもOK"},
-  {lv:2, ja:"明日、ロンドンに行く予定です。", en:"I'm going to London tomorrow.", alt:"I'm going to go to 〜 でもOK"},
-  {lv:2, ja:"ここで写真を撮ってもいいですか?", en:"Can I take pictures here?", alt:"Is it OK to take photos here? でもOK"},
-  {lv:3, ja:"ここに来たのは初めてです。", en:"This is my first time here.", alt:"It's my first time (to come) here. でもOK"},
-  {lv:3, ja:"京都に行ったことはありますか?", en:"Have you ever been to Kyoto?", alt:"ever は無くてもOK"},
-  {lv:3, ja:"何がおすすめですか?", en:"What do you recommend?", alt:""},
-  {lv:3, ja:"今日は日本より暑いですね。", en:"It's hotter than Japan today.", alt:""},
-  {lv:4, ja:"ここには3日間滞在する予定です。", en:"I'm staying here for three days.", alt:"I'm going to stay 〜 でもOK"},
-  {lv:4, ja:"あなたの街で一番好きな場所はどこですか?", en:"What's your favorite place in your city?", alt:"Where is your favorite place 〜? でもOK"},
-];
-
+/* --- リスニングバンク --- */
 const LISTEN = [
-  {rate:0.7, text:"Excuse me, is this seat taken?",
-   q:"話しかけてきた人は何を知りたい?", ch:["この席が空いているかどうか","次の駅はどこか","切符を持っているか"], a:0},
-  {rate:0.8, text:"The next train to the airport leaves from platform two.",
-   q:"空港行きの電車はどこから出る?", ch:["3番ホーム","2番ホーム","10番ホーム"], a:1},
-  {rate:0.9, text:"Would you like something to drink before your meal?",
-   q:"店員は何と言った?", ch:["食後にデザートはいかがですか","席を移動してもらえますか","食事の前に飲み物はいかがですか"], a:2},
-  {rate:1.0, text:"Sorry, we're sold out of the chocolate cake today.",
-   q:"店員は何と言った?", ch:["チョコレートケーキは今日は売り切れ","チョコレートケーキは今日は半額","ケーキは持ち帰りのみ"], a:0},
-  {rate:1.1, text:"I've lived here for ten years, so let me know if you need any tips.",
-   q:"この人は何と言っている?", ch:["この街には10日間だけ滞在している","ここに10年住んでいるので、困ったら聞いてね","観光案内所は10時に開く"], a:1},
-  {rate:1.2, text:"If you get off at the second stop and turn right, the museum is just around the corner.",
-   q:"美術館への行き方は?", ch:["2つ目の角を左に曲がる","美術館は今日は閉まっている","2つ目の停留所で降りて右に曲がる"], a:2},
+ {id:"l01",text:"Excuse me, is this seat taken?",q:"何を聞かれた?",ch:["この席が空いているか","次の駅はどこか","切符を持っているか"],a:0},
+ {id:"l02",text:"The next train to the airport leaves from platform two.",q:"空港行きの電車はどこから?",ch:["3番ホーム","2番ホーム","10番ホーム"],a:1},
+ {id:"l03",text:"Would you like something to drink before your meal?",q:"店員は何と言った?",ch:["食後にデザートはいかが","席を移動してほしい","食事の前に飲み物はいかが"],a:2},
+ {id:"l04",text:"Sorry, we're sold out of the chocolate cake today.",q:"店員は何と言った?",ch:["チョコケーキは売り切れ","チョコケーキは半額","ケーキは持ち帰りのみ"],a:0},
+ {id:"l05",text:"I've lived here for ten years, so let me know if you need any tips.",q:"この人は何と言っている?",ch:["10日間だけ滞在中","10年住んでいるから何でも聞いて","観光案内所は10時に開く"],a:1},
+ {id:"l06",text:"If you get off at the second stop and turn right, the museum is just around the corner.",q:"美術館への行き方は?",ch:["2つ目の角を左へ","今日は閉まっている","2つ目の停留所で降りて右へ"],a:2},
+ {id:"l07",text:"Could you watch my bag for a second? I'll be right back.",q:"何を頼まれた?",ch:["荷物をちょっと見ていて","かばんを運んでほしい","すぐに戻ってきてほしい"],a:0},
+ {id:"l08",text:"The museum is free on Sundays, but it gets pretty crowded.",q:"日曜日の美術館は?",ch:["休館になる","無料だけど混む","半額になる"],a:1},
+ {id:"l09",text:"You can pay by card, but we don't take cash here.",q:"この店の支払いは?",ch:["現金のみ","カードも現金もOK","カードのみ"],a:2},
+ {id:"l10",text:"Take the elevator to the fifth floor, and the pool is on your left.",q:"プールはどこ?",ch:["5階に上がって左","5階に上がって右","地下1階の奥"],a:0},
+ {id:"l11",text:"This is the last train tonight, so don't miss it.",q:"何と言われた?",ch:["この電車は回送です","これが今夜の最終電車","次の電車は10分後"],a:1},
+ {id:"l12",text:"Do you mind if I sit here? It's pretty full today.",q:"話しかけてきた人は?",ch:["席を譲ってくれた","混んでいるので座っていいか聞いた","注文を取りに来た"],a:1},
+ {id:"l13",text:"If you buy two, you get ten percent off.",q:"店員は何と言った?",ch:["2つ買うと10%引き","2つで10ドル","10個までしか買えない"],a:0},
+ {id:"l14",text:"Sorry, we're closing soon. The kitchen takes last orders at nine.",q:"店員は何と言った?",ch:["9時に開店する","ラストオーダーは9時","料理は9分で出てくる"],a:1},
+ {id:"l15",text:"It usually takes about fifteen minutes, but it depends on the traffic.",q:"所要時間について何と?",ch:["いつも正確に15分","50分はかかる","だいたい15分だが交通次第"],a:2},
+ {id:"l16",text:"I grew up here, but I moved away for a few years.",q:"この人について正しいのは?",ch:["ここで育ったが数年離れていた","ここに引っ越してきたばかり","数年後に引っ越す予定"],a:0},
 ];
 
-const GRAMMAR = [
-  {tag:"経験を聞く", s:"___ you ever been to Osaka?", ch:["Did","Are","Have","Do"], a:2},
-  {tag:"丁寧な依頼", s:"___ you help me with my bag?", ch:["May","Could","Shall","Am"], a:1},
-  {tag:"過去形", s:"I ___ this jacket yesterday.", ch:["buy","buying","have bought","bought"], a:3},
-  {tag:"比較", s:"This one is ___ than that one.", ch:["cheap","cheaper","cheapest","more cheap"], a:1},
-  {tag:"予定を言う", s:"I ___ visit the castle tomorrow.", ch:["am going to","was","have","went to"], a:0},
-  {tag:"所要時間を聞く", s:"How ___ does it take to the airport?", ch:["far","long","much","many"], a:1},
-  {tag:"提案する", s:"Why don't ___ share a taxi?", ch:["us","our","they","we"], a:3},
-  {tag:"場所の前置詞", s:"I'm staying ___ a hotel near the station.", ch:["to","on","at","for"], a:2},
-  {tag:"聞き返す", s:"Sorry, could you say that ___?", ch:["again","more","once","repeat"], a:0},
-  {tag:"want to", s:"I want ___ some souvenirs.", ch:["buy","to buy","buying","bought"], a:1},
+/* --- シャドーイングセット --- */
+const SHADOW = [
+ {id:"sh1",title:"機内にて",lines:[
+   {en:"Would you like chicken or beef?",ja:"チキンとビーフ、どちらにしますか?"},
+   {en:"Chicken, please.",ja:"チキンをお願いします"},
+   {en:"Anything to drink?",ja:"お飲み物は?"},
+   {en:"Apple juice, please. Thank you.",ja:"アップルジュースを。ありがとう"}]},
+ {id:"sh2",title:"ホテルのフロント",lines:[
+   {en:"Hi, I have a reservation.",ja:"予約している者です"},
+   {en:"Can I see your passport, please?",ja:"パスポートを拝見できますか"},
+   {en:"Sure, here you go.",ja:"はい、どうぞ"},
+   {en:"You're in room 402. Breakfast is from seven.",ja:"402号室です。朝食は7時からです"}]},
+ {id:"sh3",title:"レストラン",lines:[
+   {en:"Are you ready to order?",ja:"ご注文はお決まりですか"},
+   {en:"Yes, I'll have the pasta.",ja:"はい、パスタをお願いします"},
+   {en:"Anything to drink?",ja:"お飲み物は?"},
+   {en:"Just water, please.",ja:"水だけで大丈夫です"}]},
+ {id:"sh4",title:"バーでの雑談",lines:[
+   {en:"So, where are you from?",ja:"それで、どこから来たの?"},
+   {en:"I'm from Japan. Have you been there?",ja:"日本です。行ったことあります?"},
+   {en:"Not yet, but I'd love to go.",ja:"まだ。でもぜひ行きたいな"},
+   {en:"You should! Especially in spring.",ja:"ぜひ! 特に春がいいですよ"}]},
 ];
 
-/* ================= 状態管理 ================= */
+/* --- ご褒美: ミニストーリー & 現地フレーズ --- */
+const STORY = [
+ {id:"st1",title:"The Wrong Bus",text:"On my second day, I got on the wrong bus. I didn't notice for twenty minutes. When I finally got off, I was in a quiet neighborhood with no tourists. An old man saw my map and smiled. He walked with me to the right bus stop and told me about his town. Getting lost was the best part of my day.",ja:"間違ったバスに乗って観光客のいない地区へ。地図を見た老人が正しいバス停まで一緒に歩いてくれて、街のことを話してくれた。道に迷ったことが一番の思い出に。"},
+ {id:"st2",title:"Free Coffee",text:"There was a small cafe near my hotel. I went there every morning and always said, \"Can I get a coffee?\" On the last day, the owner said, \"This one's on the house.\" I didn't know the phrase, so she explained: it means it's free. We talked for a while, and she drew a little map of her favorite places for me.",ja:"毎朝通ったカフェで最終日に「This one's on the house(これはお店のおごり)」と言われた。意味を教えてもらい、店主お気に入りの場所の地図まで描いてもらった。"},
+ {id:"st3",title:"Rooftop View",text:"A man at the market told me, \"Check out the rooftop of the old library. Best view in town, and it's free.\" I almost didn't go because it started to rain. But I did, and the rain stopped just as I arrived. The whole city was shining below me. Sometimes the best tips come from small talk.",ja:"市場で出会った男性に「旧図書館の屋上を見てみて」と勧められた。雨が上がった直後の屋上から見えた街は最高だった。良い情報は雑談から来る。"},
+ {id:"st4",title:"It Depends",text:"I asked my host how long it takes to the beach. She said, \"It depends. Fifteen minutes if you walk fast, an hour if you stop at every nice corner.\" I chose the one-hour way. I dropped by a tiny bakery, ran into a street musician, and watched the sunset from a bridge. She was right. It depends.",ja:"ビーチまでの時間を聞くと「急げば15分、寄り道すれば1時間」。1時間の道を選び、パン屋に寄り、路上ミュージシャンに出会い、橋から夕日を見た。"},
+];
+const TIP = [
+ {id:"t1",en:"No worries.",ja:"気にしないで/大丈夫。Thank youへの返事にも使える万能フレーズ"},
+ {id:"t2",en:"Can I get 〜?",ja:"注文の定番。May I have より Can I get の方が現地のカフェでは自然"},
+ {id:"t3",en:"Have a good one!",ja:"「良い一日を!」のカジュアル版。店を出るときに言うと喜ばれる"},
+ {id:"t4",en:"Cheers!",ja:"乾杯だけでなく、イギリスやオーストラリアでは「ありがとう」「じゃあね」にも"},
+ {id:"t5",en:"I'm good, thanks.",ja:"「結構です」の自然な断り方。No thank you より柔らかい"},
+ {id:"t6",en:"Do you take card?",ja:"「カード使えますか?」。Can I use credit card? より短くて自然"},
+ {id:"t7",en:"Sorry, come again?",ja:"「もう一回言って?」の超カジュアル版。聞き返しはこれで十分"},
+ {id:"t8",en:"What do you recommend?",ja:"店でもバーでも使える魔法の一言。会話がここから始まる"},
+];
 
-const KEY = "tabigo-diag-v1";
-const STAGES = ["intro","meaning","recall","instant","listening","grammar","result"];
-const STAGE_LABELS = {meaning:"ことば", recall:"ひきだし", instant:"瞬間英作文", listening:"きく", grammar:"文のかたち"};
+/* --- 旅マップ(週=停留地) --- */
+const MAP_STOPS = ["出発","機内","入国","ホテル","カフェ","レストラン","街歩き","バー","市場","小旅行","再会","帰路"];
+const WEEK_THEME = {1:"機内・入国・最初のひとこと",2:"ホテルとカフェ",3:"レストランと買い物",4:"街歩きと雑談"};
 
-let S = load() || fresh();
+/* --- 診断結果によるシード(2026-07のユーザー診断より) --- */
+const DIAG = {
+  slowLv:{1:4.0,2:6.1,3:8.1,4:9.2},   // レベル別中央値秒
+  listenStart:0.85,                     // 限界0.9x手前から開始
+};
 
-function fresh(){
+/* =====================================================
+   状態管理
+===================================================== */
+const KEY = "tabigo-train-v1";
+const TARGET_SEC = 3.0;
+
+function defaults(){
   return {
-    stage:"intro", idx:0,
-    meaning:[],            // {en,b,correct}
-    recall:[],             // {ja,input,correct}
-    instant:[],            // {lv,t,r}  r: ok|close|ng|fail
-    listen:[],             // {rate,correct,plays}
-    listenSkipped:false,
-    grammar:[],            // {tag,correct}
+    profile:{anchor:null, start:todayStr(), listenRate:DIAG.listenStart, listenIdx:0, shadowIdx:0, onboarded:false},
+    srs:{},            // id -> {ivl,due,ease,reps,lap,hist:[{d,sec,r}],stage} stage: chunkは0=認識,1=想起
+    log:[],            // {d, n, medSec, min}
+    owned:[],          // 獲得したご褒美id
+    totalReviews:0,
   };
 }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
-function load(){
-  try{ const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+function normalize(d){
+  const base = defaults();
+  if(!d || typeof d !== "object" || !d.profile) return base;
+  d.profile = Object.assign(base.profile, d.profile);
+  d.srs = d.srs || {}; d.log = d.log || []; d.owned = d.owned || [];
+  d.totalReviews = d.totalReviews || 0;
+  return d;
+}
+/* 保存は二重化: localStorage(高速)+ IndexedDB(復旧用)。表示環境によって
+   片方が消えることがあるため。両方消えたときはバックアップコードで復元する */
+function save(){
+  const json = JSON.stringify(D);
+  try{ localStorage.setItem(KEY, json); }catch(e){}
+  idbPut(json);
+}
+function load(){ try{ const r = localStorage.getItem(KEY); return r?JSON.parse(r):null; }catch(e){ return null; } }
+
+const IDB_NAME = "tabigo", IDB_STORE = "kv";
+function idbOpen(cb){
+  try{
+    const r = indexedDB.open(IDB_NAME, 1);
+    r.onupgradeneeded = ()=>{ try{ r.result.createObjectStore(IDB_STORE); }catch(e){} };
+    r.onsuccess = ()=>cb(r.result);
+    r.onerror = ()=>cb(null);
+  }catch(e){ cb(null); }
+}
+function idbPut(json){
+  idbOpen(db=>{ if(!db) return; try{ db.transaction(IDB_STORE,"readwrite").objectStore(IDB_STORE).put(json, KEY); }catch(e){} });
+}
+function idbGet(){
+  return new Promise(res=>{
+    idbOpen(db=>{
+      if(!db) return res(null);
+      try{
+        const g = db.transaction(IDB_STORE).objectStore(IDB_STORE).get(KEY);
+        g.onsuccess = ()=>res(g.result||null);
+        g.onerror = ()=>res(null);
+      }catch(e){ res(null); }
+    });
+  });
+}
+function idbClear(){
+  idbOpen(db=>{ if(!db) return; try{ db.transaction(IDB_STORE,"readwrite").objectStore(IDB_STORE).delete(KEY); }catch(e){} });
 }
 
-/* ================= 描画基盤 ================= */
+/* バックアップコード: 全学習データを1つの文字列に(貼り付けで完全復元) */
+function exportCode(){ return "TABIGO1." + btoa(unescape(encodeURIComponent(JSON.stringify(D)))); }
+function importCode(str){
+  try{
+    const s = String(str).trim();
+    if(!s.startsWith("TABIGO1.")) return false;
+    const d = JSON.parse(decodeURIComponent(escape(atob(s.slice(8)))));
+    if(!d || !d.profile) return false;
+    D = normalize(d); save(); return true;
+  }catch(e){ return false; }
+}
+function copyText(text, btn){
+  const done = ()=>{ if(btn) btn.textContent = "コピーしました ✓"; };
+  const fallback = ()=>{
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta); done();
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done, fallback);
+  } else fallback();
+}
 
-const app = document.getElementById("app");
-const journeyEl = document.getElementById("journey");
+let D = normalize(load());
 
-function render(){
-  drawJourney();
-  const fn = {
-    intro: vIntro, meaning: vMeaning, recall: vRecall,
-    instant: vInstant, listening: vListening, grammar: vGrammar, result: vResult,
-  }[S.stage];
-  app.innerHTML = "";
-  fn();
+function todayStr(){ const d = new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function daysBetween(a,b){ return Math.round((new Date(b) - new Date(a))/86400000); }
+function currentWeek(){ return Math.min(12, Math.floor(daysBetween(D.profile.start, todayStr())/7)+1); }
+function isEvening(){ return new Date().getHours() >= 21; }
+
+/* =====================================================
+   SRSスケジューラ
+===================================================== */
+function st(id){
+  if(!D.srs[id]) D.srs[id] = {ivl:0,due:null,ease:2.0,reps:0,lap:0,hist:[],stage:0};
+  return D.srs[id];
+}
+function isNew(id){ return !D.srs[id] || D.srs[id].reps===0; }
+function isDue(id){ const s = D.srs[id]; return s && s.reps>0 && s.due && s.due <= todayStr(); }
+
+function grade(id, r, sec){
+  const s = st(id);
+  s.reps++;
+  s.hist.push({d:todayStr(), sec:(sec!=null?Math.round(sec*10)/10:null), r});
+  if(s.hist.length>20) s.hist.shift();
+  if(r==="again"){ s.lap++; s.ivl = 0; s.due = todayStr(); }
+  else if(r==="hard"){ s.ivl = Math.max(1, Math.round((s.ivl||1)*1.2)); s.ease = Math.max(1.3, s.ease-0.05); s.due = addDays(s.ivl); }
+  else { // good
+    s.ivl = s.ivl===0 ? 1 : Math.round(s.ivl * s.ease);
+    s.ivl = Math.min(s.ivl, 120);
+    s.ease = Math.min(2.6, s.ease+0.02);
+    s.due = addDays(s.ivl);
+  }
+  D.totalReviews++;
   save();
-  window.scrollTo(0,0);
+}
+function addDays(n){ const d = new Date(); d.setDate(d.getDate()+n); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+/* 出題理由の生成 */
+function whyText(id, isNewCard, item){
+  if(isNewCard){
+    return item._type==="sent" ? `今週のテーマ「${WEEK_THEME[Math.min(4,currentWeek())]||"応用"}」の新しい文` : "新しい表現(診断で優先と判定)";
+  }
+  const s = D.srs[id];
+  const last = s.hist[s.hist.length-1];
+  if(!last) return "復習";
+  const ago = daysBetween(last.d, todayStr());
+  const agoTxt = ago===0?"今日":ago===1?"昨日":`${ago}日前`;
+  if(last.r==="again") return `${agoTxt}に出てこなかった問題`;
+  if(last.r==="hard") return `${agoTxt}に「惜しい」だった問題`;
+  if(last.sec!=null && last.sec>TARGET_SEC) return `${agoTxt}は ${last.sec.toFixed(1)}秒。目標は3秒`;
+  return `${agoTxt}に正解。忘れる前の総仕上げ`;
 }
 
-function drawJourney(){
-  const order = ["meaning","recall","instant","listening","grammar"];
-  const cur = order.indexOf(S.stage);
-  const doneAll = S.stage === "result";
-  let html = "";
-  order.forEach((st,i)=>{
-    const cls = doneAll || (cur > -1 && i < cur) || (cur === -1 && S.stage!=="intro") ? "done" : (i===cur ? "now" : "");
-    html += `<div class="jstop ${cls}"><span class="jdot"></span><span class="jlabel">${STAGE_LABELS[st]}</span></div>`;
-    if(i < order.length-1){
-      const lineDone = doneAll || (cur > -1 && i < cur);
-      html += `<div class="jline ${lineDone?"done":""}"></div>`;
+/* =====================================================
+   セッション構築
+===================================================== */
+function availableSents(){ const w = currentWeek(); return SENT.filter(x=>x.wk<=Math.max(1,w)); }
+
+function buildQueue(minutes){
+  const evening = isEvening();
+  const q = [];
+  // 期限が来ている復習(文)
+  const dueS = availableSents().filter(x=>isDue(x.id));
+  // 期限が来ている復習(チャンク)
+  const dueC = CHUNK.filter(x=>isDue(x.id));
+  // 並べ替え: 遅延日数が大きい順
+  const byOverdue = (a,b)=> (D.srs[a.id].due < D.srs[b.id].due ? -1 : 1);
+  dueS.sort(byOverdue); dueC.sort(byOverdue);
+  dueS.forEach(x=>q.push({t:"sent", item:x}));
+  dueC.forEach(x=>q.push({t:"chunk", item:x}));
+  // 新規(夜は出さない)
+  if(!evening){
+    const nS = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
+    const nC = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
+    // 文の新規: 診断で遅かったレベル順(4,3,2,1)ではなく、基礎から固めつつ週テーマ順
+    const newS = availableSents().filter(x=>isNew(x.id)).slice(0, nS);
+    // チャンク新規: pri優先
+    const newC = CHUNK.filter(x=>isNew(x.id)).sort((a,b)=>b.pri-a.pri).slice(0, nC);
+    newS.forEach(x=>q.push({t:"sent", item:x, isNew:true}));
+    newC.forEach(x=>q.push({t:"chunk", item:x, isNew:true}));
+  }
+  // 文とチャンクを交互に混ぜる(インターリーブ)
+  const sents = q.filter(x=>x.t==="sent"), chunks = q.filter(x=>x.t==="chunk");
+  const mixed = [];
+  const maxLen = Math.max(sents.length, chunks.length);
+  for(let i=0;i<maxLen;i++){ if(sents[i]) mixed.push(sents[i]); if(chunks[i]) mixed.push(chunks[i]); }
+  // リスニングを挟む(10分以上)
+  if(minutes>=10){
+    const nL = minutes>=20?3:2;
+    for(let i=0;i<nL;i++){
+      const item = LISTEN[(D.profile.listenIdx + i) % LISTEN.length];
+      const pos = Math.min(mixed.length, Math.round((i+1)*mixed.length/(nL+1)) + i);
+      mixed.splice(pos, 0, {t:"listen", item});
     }
-  });
-  journeyEl.innerHTML = html;
+  }
+  // シャドーイング(20分)は最後
+  if(minutes>=20){
+    mixed.push({t:"shadow", item:SHADOW[D.profile.shadowIdx % SHADOW.length]});
+  }
+  return mixed;
 }
 
-function el(html){
-  const t = document.createElement("template");
-  t.innerHTML = html.trim();
-  return t.content.firstChild;
-}
-function card(html){ const c = el(`<section class="card">${html}</section>`); app.appendChild(c); return c; }
+/* =====================================================
+   描画基盤
+===================================================== */
+const app = document.getElementById("app");
+const metaEl = document.getElementById("meta");
+function el(html){ const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content.firstChild; }
+function card(html, cls){ const c = el(`<section class="card ${cls||""}">${html}</section>`); app.appendChild(c); return c; }
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function clear(){ app.innerHTML=""; window.scrollTo(0,0); }
 
-/* ================= 画面: イントロ ================= */
-
-function vIntro(){
-  const resumable = S.meaning.length || S.recall.length || S.instant.length || S.listen.length || S.grammar.length;
-  const c = card(`
-    <span class="eyebrow">PASSPORT CHECK</span>
-    <h1>出発前に、いまの英語力を測ります</h1>
-    <p class="sub">5つのパート・合計15分ほど。途中でやめても続きから再開できます。結果はこの端末にだけ保存されます。</p>
-    <ul class="plain sub">
-      <li><b>ことば</b> — 単語・熟語の意味がわかるか(選択式)</li>
-      <li><b>ひきだし</b> — 日本語から英単語が出てくるか(入力式)</li>
-      <li><b>瞬間英作文</b> — 短い日本語を英語で言えるか。<b>声を出せる場所</b>がおすすめ</li>
-      <li><b>きく</b> — どの速さまで聞き取れるか。<b>音が出ます</b></li>
-      <li><b>文のかたち</b> — 会話で使う文型の穴さがし(選択式)</li>
-    </ul>
-    <div class="choices"></div>
-  `);
-  const box = c.querySelector(".choices");
-  if(resumable){
-    const b1 = el(`<button class="btn-primary">続きから再開する</button>`);
-    b1.onclick = ()=>{ S.stage = nextIncomplete(); S.idx = curIdx(S.stage); render(); };
-    box.appendChild(b1);
-    const b2 = el(`<button class="btn-ghost">最初からやり直す</button>`);
-    b2.onclick = ()=>{ S = fresh(); S.stage="meaning"; render(); };
-    box.appendChild(b2);
-  } else {
-    const b = el(`<button class="btn-primary">診断をはじめる</button>`);
-    b.onclick = ()=>{ S.stage="meaning"; S.idx=0; render(); };
-    box.appendChild(b);
-  }
-}
-
-function nextIncomplete(){
-  if(S.meaning.length < MEANING.length) return "meaning";
-  if(S.recall.length < RECALL.length) return "recall";
-  if(S.instant.length < INSTANT.length) return "instant";
-  if(!S.listenSkipped && S.listen.length < LISTEN.length) return "listening";
-  if(S.grammar.length < GRAMMAR.length) return "grammar";
-  return "result";
-}
-function curIdx(stage){
-  return {meaning:S.meaning.length, recall:S.recall.length, instant:S.instant.length,
-          listening:S.listen.length, grammar:S.grammar.length}[stage] || 0;
-}
-
-/* ================= 画面: パート1 ことば(意味) ================= */
-
-function vMeaning(){
-  if(S.idx >= MEANING.length){ S.stage="recall"; S.idx=0; render(); return; }
-  const it = MEANING[S.idx];
-  const c = card(`
-    <span class="eyebrow">PART 1 / ことば</span>
-    <div class="counter">${S.idx+1} / ${MEANING.length}</div>
-    <p class="sub" style="margin-bottom:2px">この語の意味は?</p>
-    <div class="prompt-en">${esc(it.en)}</div>
-    <div class="choices"></div>
-  `);
-  const box = c.querySelector(".choices");
-  it.ch.forEach((choice)=>{
-    const b = el(`<button class="choice">${esc(choice)}</button>`);
-    b.onclick = ()=>{
-      const correct = (choice === it.ja);
-      box.querySelectorAll("button").forEach(x=>{
-        x.disabled = true;
-        if(x.textContent === it.ja) x.classList.add("correct");
-      });
-      if(!correct) b.classList.add("wrong");
-      S.meaning.push({en:it.en, b:it.b, correct});
-      save();
-      setTimeout(()=>{ S.idx++; render(); }, correct ? 350 : 1100);
-    };
-    box.appendChild(b);
-  });
-}
-
-/* ================= 画面: パート2 ひきだし(想起) ================= */
-
-function normalize(s){
-  return s.toLowerCase().replace(/[.,!?'’"]/g,"").replace(/\s+/g," ").trim();
-}
-function recallMatch(input, oks){
-  const n = normalize(input);
-  if(!n) return false;
-  return oks.some(o=>{
-    const no = normalize(o);
-    return n === no || n.split(" ").join("") === no.split(" ").join("") || n.includes(no);
-  });
-}
-
-function vRecall(){
-  if(S.idx >= RECALL.length){ S.stage="instant"; S.idx=0; render(); return; }
-  const it = RECALL[S.idx];
-  const c = card(`
-    <span class="eyebrow">PART 2 / ひきだし</span>
-    <div class="counter">${S.idx+1} / ${RECALL.length}</div>
-    <p class="sub" style="margin-bottom:2px">英語で何と言う? つづりが少し違っても大丈夫、思い出せるかが大事です。</p>
-    <div class="prompt-ja">「${esc(it.ja)}」</div>
-    ${it.hint ? `<p class="sub">ヒント: ${esc(it.hint)}</p>` : ""}
-    <input type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="英語で入力" aria-label="英語で入力">
-    <div class="btn-row">
-      <button class="btn-primary" data-act="answer">回答する</button>
-      <button class="btn-ghost" data-act="giveup">出てこない</button>
-    </div>
-    <div class="fbslot"></div>
-  `);
-  const input = c.querySelector("input");
-  const slot = c.querySelector(".fbslot");
-  setTimeout(()=>input.focus(), 50);
-
-  function finish(gaveUp){
-    const val = input.value;
-    const correct = !gaveUp && recallMatch(val, it.ok);
-    input.disabled = true;
-    c.querySelectorAll(".btn-row button").forEach(b=>b.disabled=true);
-    if(correct){
-      slot.appendChild(el(`<div class="feedback good">◎ ${esc(it.ok[0])} — 出てきました</div>`));
-    } else {
-      slot.appendChild(el(`<div class="feedback bad">答えの例: <b>${esc(it.ok[0])}</b>${it.ok[1]?` / ${esc(it.ok[1])}`:""}</div>`));
-    }
-    S.recall.push({ja:it.ja, input:val, correct});
-    save();
-    setTimeout(()=>{ S.idx++; render(); }, correct ? 700 : 1600);
-  }
-  c.querySelector('[data-act=answer]').onclick = ()=>finish(false);
-  c.querySelector('[data-act=giveup]').onclick = ()=>finish(true);
-  input.addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); finish(false); } });
-}
-
-/* ================= 画面: パート3 瞬間英作文 ================= */
-
-let instTimerId = null, instT0 = 0;
-
-function vInstant(){
-  if(S.idx >= INSTANT.length){ S.stage="listening"; S.idx=0; render(); return; }
-  const it = INSTANT[S.idx];
-  const c = card(`
-    <span class="eyebrow">PART 3 / 瞬間英作文</span>
-    <div class="counter">${S.idx+1} / ${INSTANT.length}</div>
-    <p class="sub" style="margin-bottom:2px">この日本語を<b>声に出して</b>英語で言ってください(小声・心の中でもOK)。言えたらすぐボタンを押します。</p>
-    <div class="prompt-ja">${esc(it.ja)}</div>
-    <div class="timer" aria-hidden="true">0.0 秒</div>
-    <div class="btn-row">
-      <button class="btn-primary" data-act="said">言えた!</button>
-      <button class="btn-ghost" data-act="fail">出てこなかった</button>
-    </div>
-    <div class="fbslot"></div>
-  `);
-  const timerEl = c.querySelector(".timer");
-  instT0 = performance.now();
-  clearInterval(instTimerId);
-  instTimerId = setInterval(()=>{
-    timerEl.textContent = ((performance.now()-instT0)/1000).toFixed(1) + " 秒";
-  }, 100);
-
-  function reveal(said){
-    clearInterval(instTimerId);
-    const t = (performance.now()-instT0)/1000;
-    c.querySelectorAll(".btn-row button").forEach(b=>b.disabled=true);
-    const slot = c.querySelector(".fbslot");
-    slot.appendChild(el(`
-      <div class="model-answer">
-        <div class="en">${esc(it.en)}</div>
-        ${it.alt ? `<div class="alt">${esc(it.alt)}</div>` : ""}
-      </div>
-    `));
-    if(said){
-      const g = el(`
-        <div class="choices">
-          <p class="sub" style="margin:10px 0 0">自分の答えは合っていましたか?</p>
-          <button data-r="ok">◎ だいたい合ってた</button>
-          <button data-r="close">△ 惜しい(一部違った)</button>
-          <button data-r="ng">✕ けっこう違った</button>
-        </div>`);
-      g.querySelectorAll("button").forEach(b=>{
-        b.onclick = ()=>{
-          S.instant.push({lv:it.lv, t:Math.round(t*10)/10, r:b.dataset.r});
-          S.idx++; render();
-        };
-      });
-      slot.appendChild(g);
-    } else {
-      S.instant.push({lv:it.lv, t:Math.round(t*10)/10, r:"fail"});
-      save();
-      const nb = el(`<div class="choices"><button class="btn-primary">次へ</button></div>`);
-      nb.querySelector("button").onclick = ()=>{ S.idx++; render(); };
-      slot.appendChild(nb);
-    }
-  }
-  c.querySelector('[data-act=said]').onclick = ()=>reveal(true);
-  c.querySelector('[data-act=fail]').onclick = ()=>reveal(false);
-}
-
-/* ================= 画面: パート4 きく ================= */
-
+/* --- 音声 --- */
 let voiceCache = null;
 function pickVoice(){
   if(voiceCache) return voiceCache;
@@ -480,207 +508,544 @@ function pickVoice(){
   voiceCache = en.find(v=>v.lang==="en-US") || en.find(v=>v.lang==="en-GB") || en[0] || null;
   return voiceCache;
 }
-if(window.speechSynthesis){
-  speechSynthesis.onvoiceschanged = ()=>{ voiceCache = null; pickVoice(); };
-}
-
-function speak(text, rate, onend){
+if(window.speechSynthesis){ speechSynthesis.onvoiceschanged = ()=>{ voiceCache=null; pickVoice(); }; }
+function speak(text, rate){
+  if(!window.speechSynthesis) return;
   const u = new SpeechSynthesisUtterance(text);
-  const v = pickVoice();
-  if(v) u.voice = v;
-  u.lang = v ? v.lang : "en-US";
-  u.rate = rate;
-  u.onend = onend || null;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+  const v = pickVoice(); if(v){ u.voice=v; u.lang=v.lang; } else u.lang="en-US";
+  u.rate = rate || 1.0;
+  speechSynthesis.cancel(); speechSynthesis.speak(u);
 }
 
-function vListening(){
-  if(S.listenSkipped || S.idx >= LISTEN.length){ S.stage="grammar"; S.idx=0; render(); return; }
-  const it = LISTEN[S.idx];
-  let plays = 0;
-  const MAXPLAY = 3;
+/* =====================================================
+   画面: オンボーディング(アンカー設定)
+===================================================== */
+const ANCHORS = ["朝のコーヒーを淹れたら","通勤で電車に座ったら","昼休みが始まったら","帰宅して腰を下ろしたら","ベッドに入ったら"];
+
+/* データが空の状態で開いたとき: 新規 or バックアップ復元 */
+function vWelcome(){
+  clear(); metaEl.textContent="";
   const c = card(`
-    <span class="eyebrow">PART 4 / きく</span>
-    <div class="counter">${S.idx+1} / ${LISTEN.length}</div>
-    <span class="speedtag">SPEED ${it.rate.toFixed(1)}x</span>
-    <p class="sub" style="margin-bottom:8px">音声を聞いて、内容に合うものを選んでください(${MAXPLAY}回まで再生できます)。</p>
-    <button class="play-btn">▶ 音声を再生する(あと${MAXPLAY}回)</button>
-    <div class="choices"></div>
-    <div class="btn-row"><button class="btn-ghost" data-act="novoice">音が出ない / この端末では聞けない</button></div>
-  `);
-  const playBtn = c.querySelector(".play-btn");
-  playBtn.onclick = ()=>{
-    if(plays >= MAXPLAY) return;
-    plays++;
-    playBtn.textContent = plays >= MAXPLAY ? "▶ 再生回数を使い切りました" : `▶ 音声を再生する(あと${MAXPLAY-plays}回)`;
-    if(plays >= MAXPLAY) playBtn.disabled = true;
-    speak(it.text, it.rate);
-  };
-  const box = c.querySelector(".choices");
-  it.ch.forEach((choice,i)=>{
-    const b = el(`<button class="choice">${esc(choice)}</button>`);
-    b.onclick = ()=>{
-      if(plays === 0){ speak(it.text, it.rate); plays=1; return; } // 未再生ならまず再生
-      const correct = (i === it.a);
-      box.querySelectorAll("button").forEach((x,xi)=>{ x.disabled=true; if(xi===it.a) x.classList.add("correct"); });
-      if(!correct) b.classList.add("wrong");
-      S.listen.push({rate:it.rate, correct, plays});
-      save();
-      setTimeout(()=>{ S.idx++; render(); }, correct ? 400 : 1200);
-    };
-    box.appendChild(b);
-  });
-  c.querySelector('[data-act=novoice]').onclick = ()=>{
-    S.listenSkipped = true; S.stage="grammar"; S.idx=0; render();
-  };
-}
-
-/* ================= 画面: パート5 文のかたち ================= */
-
-function vGrammar(){
-  if(S.idx >= GRAMMAR.length){ S.stage="result"; render(); return; }
-  const it = GRAMMAR[S.idx];
-  const c = card(`
-    <span class="eyebrow">PART 5 / 文のかたち</span>
-    <div class="counter">${S.idx+1} / ${GRAMMAR.length}</div>
-    <p class="sub" style="margin-bottom:2px">空所に入るものは?</p>
-    <div class="prompt-en" style="font-size:1.25rem">${esc(it.s)}</div>
-    <div class="choices"></div>
-  `);
-  const box = c.querySelector(".choices");
-  it.ch.forEach((choice,i)=>{
-    const b = el(`<button class="choice">${esc(choice)}</button>`);
-    b.onclick = ()=>{
-      const correct = (i === it.a);
-      box.querySelectorAll("button").forEach((x,xi)=>{ x.disabled=true; if(xi===it.a) x.classList.add("correct"); });
-      if(!correct) b.classList.add("wrong");
-      S.grammar.push({tag:it.tag, correct});
-      save();
-      setTimeout(()=>{ S.idx++; render(); }, correct ? 350 : 1100);
-    };
-    box.appendChild(b);
-  });
-}
-
-/* ================= 画面: 結果 ================= */
-
-function pct(c,t){ return t ? Math.round(c/t*100) : 0; }
-
-function buildResult(){
-  const band = b => {
-    const xs = S.meaning.filter(m=>m.b===b);
-    return [xs.filter(m=>m.correct).length, xs.length];
-  };
-  const missedWords = S.meaning.filter(m=>!m.correct).map(m=>m.en);
-  const recallOk = S.recall.filter(r=>r.correct).length;
-  const recallMissed = S.recall.filter(r=>!r.correct).map(r=>r.ja);
-  const lvStats = {};
-  [1,2,3,4].forEach(lv=>{
-    const xs = S.instant.filter(i=>i.lv===lv);
-    if(!xs.length) return;
-    const okc = xs.filter(i=>i.r==="ok").length;
-    const closec = xs.filter(i=>i.r==="close").length;
-    const times = xs.filter(i=>i.r!=="fail").map(i=>i.t).sort((a,b)=>a-b);
-    const med = times.length ? times[Math.floor(times.length/2)] : null;
-    lvStats[lv] = {ok:okc, close:closec, total:xs.length, medSec:med};
-  });
-  const listenOkRates = S.listen.filter(l=>l.correct).map(l=>l.rate);
-  const listenNgRates = S.listen.filter(l=>!l.correct).map(l=>l.rate);
-  const gOk = S.grammar.filter(g=>g.correct).length;
-  const gMissed = S.grammar.filter(g=>!g.correct).map(g=>g.tag);
-  return {
-    v:1,
-    meaning:{A:band("A"), B:band("B"), C:band("C"), missed:missedWords},
-    recall:{score:[recallOk, S.recall.length], missed:recallMissed},
-    instant:lvStats,
-    listen:{ok:listenOkRates, ng:listenNgRates, skipped:S.listenSkipped,
-            replays:S.listen.reduce((s,l)=>s+l.plays,0)},
-    grammar:{score:[gOk, S.grammar.length], missed:gMissed},
-  };
-}
-
-function vResult(){
-  const R = buildResult();
-  const [a1,a2] = R.meaning.A, [b1,b2] = R.meaning.B, [c1,c2] = R.meaning.C;
-  const [r1,r2] = R.recall.score, [g1,g2] = R.grammar.score;
-  const maxRate = R.listen.ok.length ? Math.max(...R.listen.ok) : 0;
-
-  card(`
-    <span class="eyebrow">ARRIVAL</span>
-    <div class="stamp">診断完了</div>
-    <h1>おつかれさまでした</h1>
-    <p class="sub">これがあなたの現在地です。下の「結果コード」をコピーして、Claudeとのチャットに貼り付けてください。専用カリキュラムを作ります。</p>
-  `);
-
-  const sec1 = card(`
-    <h2>ことば(意味がわかるか)</h2>
-    <div class="result-grid">
-      <div><div class="stat"><span class="k">基礎の単語</span><span class="v">${a1} / ${a2}</span></div><div class="bar"><i style="width:${pct(a1,a2)}%"></i></div></div>
-      <div><div class="stat"><span class="k">中級の単語</span><span class="v">${b1} / ${b2}</span></div><div class="bar"><i style="width:${pct(b1,b2)}%"></i></div></div>
-      <div><div class="stat"><span class="k">句動詞・熟語</span><span class="v">${c1} / ${c2}</span></div><div class="bar"><i style="width:${pct(c1,c2)}%"></i></div></div>
-    </div>
-    ${R.meaning.missed.length ? `<p class="sub" style="margin-top:10px">迷った語: ${R.meaning.missed.map(esc).join(", ")}</p>` : ""}
-  `);
-
-  card(`
-    <h2>ひきだし(英語が出てくるか)</h2>
-    <div><div class="stat"><span class="k">日本語 → 英語</span><span class="v">${r1} / ${r2}</span></div><div class="bar"><i style="width:${pct(r1,r2)}%"></i></div></div>
-    ${R.recall.missed.length ? `<p class="sub" style="margin-top:10px">出てこなかった: ${R.recall.missed.map(esc).join("、")}</p>` : ""}
-  `);
-
-  const lvName = {1:"基本の文(中1相当)",2:"お願い・予定(中2相当)",3:"経験・比較(中3相当)",4:"雑談の文(応用)"};
-  let instHtml = "";
-  Object.keys(R.instant).forEach(lv=>{
-    const st = R.instant[lv];
-    const good = st.ok + st.close;
-    instHtml += `<div><div class="stat"><span class="k">${lvName[lv]}</span><span class="v">${good} / ${st.total}${st.medSec!=null?` ・ ${st.medSec.toFixed(1)}秒`:""}</span></div><div class="bar"><i style="width:${pct(good,st.total)}%"></i></div></div>`;
-  });
-  card(`
-    <h2>瞬間英作文(言えるか・何秒で)</h2>
-    <div class="result-grid">${instHtml}</div>
-    <p class="sub" style="margin-top:10px">秒数は「言えた」までの中央値。会話では3秒以内が目安です。</p>
-  `);
-
-  card(`
-    <h2>きく(ついていける速さ)</h2>
-    ${R.listen.skipped
-      ? `<p class="sub">この端末では音声が再生できなかったため、スキップしました。</p>`
-      : `<div class="stat"><span class="k">正解できた最高速度</span><span class="v">${maxRate ? maxRate.toFixed(1)+"x" : "—"}</span></div>
-         <p class="sub">1.0x がネイティブのゆっくりめの自然速度です。${R.listen.ng.length?`聞き取れなかった速度: ${R.listen.ng.map(r=>r.toFixed(1)+"x").join(", ")}`:"全問正解でした。"}</p>`}
-  `);
-
-  card(`
-    <h2>文のかたち</h2>
-    <div><div class="stat"><span class="k">会話で使う文型</span><span class="v">${g1} / ${g2}</span></div><div class="bar"><i style="width:${pct(g1,g2)}%"></i></div></div>
-    ${R.grammar.missed.length ? `<p style="margin-top:10px">${R.grammar.missed.map(t=>`<span class="tagchip">${esc(t)}</span>`).join("")}</p>` : `<p class="sub" style="margin-top:10px">大きな穴はありません。</p>`}
-  `);
-
-  const code = JSON.stringify(R);
-  const cc = card(`
-    <h2>結果コード</h2>
-    <p class="sub">これをコピーして、チャットに貼り付けてください。</p>
-    <textarea class="code" readonly>${esc(code)}</textarea>
+    <span class="eyebrow">ようこそ</span>
+    <h1>はじめてですか?<br>それとも続きから?</h1>
+    <p class="sub">以前の学習データがこの画面に見当たらない場合も、バックアップコードがあれば完全に復元できます。</p>
     <div class="choices">
-      <button class="btn-primary" data-act="copy">結果コードをコピー</button>
-      <button class="btn-ghost" data-act="redo">最初からやり直す</button>
+      <button class="btn-primary" data-act="new">はじめて使う</button>
+      <button data-act="restore">バックアップコードから復元する</button>
     </div>
+    <div class="fbslot"></div>
   `);
-  const ta = cc.querySelector("textarea");
-  cc.querySelector('[data-act=copy]').onclick = (e)=>{
-    ta.select(); ta.setSelectionRange(0, 99999);
-    const done = ()=>{ e.target.textContent = "コピーしました ✓"; };
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(code).then(done, ()=>{ document.execCommand("copy"); done(); });
-    } else { document.execCommand("copy"); done(); }
-  };
-  cc.querySelector('[data-act=redo]').onclick = ()=>{
-    if(confirm("結果を消して最初からやり直しますか?")){ S = fresh(); render(); }
+  c.querySelector('[data-act=new]').onclick = ()=>vOnboard();
+  c.querySelector('[data-act=restore]').onclick = ()=>{
+    const slot = c.querySelector(".fbslot");
+    if(slot.querySelector("input")) return;
+    const f = el(`<div>
+      <p class="sub" style="margin-top:12px">コード(TABIGO1. で始まる文字列)を貼り付けてください:</p>
+      <input type="text" autocomplete="off" spellcheck="false" placeholder="TABIGO1.〜" aria-label="バックアップコード">
+      <div class="btn-row"><button class="btn-primary" data-act="do">復元する</button></div>
+      <div class="msg"></div>
+    </div>`);
+    f.querySelector('[data-act=do]').onclick = ()=>{
+      const ok = importCode(f.querySelector("input").value);
+      if(ok){ vHome(); }
+      else f.querySelector(".msg").innerHTML = `<div class="feedback bad">コードを読み取れませんでした。<b>TABIGO1.</b> から最後まで全部コピーされているか確認してください。</div>`;
+    };
+    slot.appendChild(f);
   };
 }
 
-/* ================= 起動 ================= */
-render();
+function vOnboard(){
+  clear(); metaEl.textContent="";
+  const c = card(`
+    <span class="eyebrow">はじめに(1回だけ)</span>
+    <h1>「いつやるか」を決めずに、<br>「何のあとにやるか」だけ決めます</h1>
+    <p class="sub">意志や気合いは当てにしません。すでに毎日やっている行動の直後に3分をくっつけると、努力なしで発火することが分かっています。ひとつ選んでください。</p>
+    <div class="choices"></div>
+    <p class="sub" style="margin-top:12px">自分で決める場合はここに入力:</p>
+    <input type="text" placeholder="例: 歯みがきが終わったら" aria-label="自分のきっかけを入力">
+    <div class="btn-row"><button class="btn-primary" data-act="free">これで決定</button></div>
+  `);
+  const box = c.querySelector(".choices");
+  ANCHORS.forEach(a=>{
+    const b = el(`<button>${esc(a)}、タビゴを3分</button>`);
+    b.onclick = ()=>{ D.profile.anchor = a; D.profile.onboarded = true; save(); vHome(); };
+    box.appendChild(b);
+  });
+  c.querySelector('[data-act=free]').onclick = ()=>{
+    const v = c.querySelector("input").value.trim();
+    if(!v) return;
+    D.profile.anchor = v; D.profile.onboarded = true; save(); vHome();
+  };
+}
+
+/* =====================================================
+   画面: ホーム
+===================================================== */
+function medianOf(arr){ if(!arr.length) return null; const s=[...arr].sort((a,b)=>a-b); return s[Math.floor(s.length/2)]; }
+
+function vHome(){
+  clear(); metaEl.textContent = "";
+  const wk = currentWeek();
+  const dueCount = availableSents().filter(x=>isDue(x.id)).length + CHUNK.filter(x=>isDue(x.id)).length;
+  const evening = isEvening();
+
+  /* 反射速度グラフ */
+  const speedLogs = D.log.filter(l=>l.medSec!=null);
+  let graphHtml = `<p class="sub">セッションを終えると、ここに「言えるまでの秒数」の推移が描かれていきます。診断時の中央値はレベル1で4.0秒、雑談レベルで9.2秒でした。</p>`;
+  let deltaHtml = "";
+  if(speedLogs.length){
+    const last = speedLogs[speedLogs.length-1].medSec;
+    if(speedLogs.length>=2){
+      const prev = speedLogs[speedLogs.length-2].medSec;
+      const diff = Math.round((last-prev)*10)/10;
+      deltaHtml = diff<0 ? `<span class="delta down">▼ ${Math.abs(diff).toFixed(1)}秒 前回より速い</span>`
+                : diff>0 ? `<span class="delta up">▲ ${diff.toFixed(1)}秒</span>` : `<span class="delta">前回と同じ</span>`;
+    }
+    graphHtml = `
+      <div class="big-metric"><span class="num">${last.toFixed(1)}</span><span class="unit">秒</span>${deltaHtml}</div>
+      <p class="sub" style="margin-bottom:6px">最新セッションの「言えるまで」中央値(目標 3.0秒)</p>
+      ${speedGraphSVG(speedLogs)}`;
+  }
+  card(`<span class="eyebrow">REFLEX SPEED</span><h2>反射速度</h2>${graphHtml}`);
+
+  /* 旅マップ */
+  let mapHtml = `<div class="mapline">`;
+  MAP_STOPS.forEach((s,i)=>{
+    const cls = i < wk ? "done" : (i===wk ? "now" : "");
+    mapHtml += `<div class="mstop ${cls}"><span class="mdot"></span><span class="mlabel">${esc(s)}</span></div>`;
+    if(i<MAP_STOPS.length-1) mapHtml += `<div class="mline ${i<wk?"done":""}"></div>`;
+  });
+  mapHtml += `</div>`;
+  card(`<span class="eyebrow">JOURNEY / 第${wk}週</span><h2>${esc(WEEK_THEME[Math.min(4,wk)]||"応用と実戦")}</h2>${mapHtml}`);
+
+  /* 今日のメニュー */
+  const anchorTxt = D.profile.anchor ? `<p class="sub">きっかけ: ${esc(D.profile.anchor)}、タビゴを3分</p>` : "";
+  card(`
+    <span class="eyebrow">TODAY</span>
+    <h2>今日は何分?</h2>
+    ${anchorTxt}
+    ${evening ? `<p class="sub">🌙 21時以降なので新しい内容は出しません。復習だけで記憶を固めて寝ましょう。</p>` : ""}
+    <p class="sub">${dueCount>0 ? `復習期限が来ているカード: <b>${dueCount}枚</b>` : "復習期限のカードはありません。新しい表現から始めます。"}</p>
+    <div class="menu-grid">
+      <button data-min="3"><span class="m-min">3<small>分</small></span><span class="m-desc">復習だけ<br>布団の中でOK</span></button>
+      <button data-min="10"><span class="m-min">10<small>分</small></span><span class="m-desc">復習+新規<br>+リスニング</span></button>
+      <button data-min="20"><span class="m-min">20<small>分</small></span><span class="m-desc">フル<br>+声を出す練習</span></button>
+    </div>
+  `).querySelectorAll("[data-min]").forEach(b=>{
+    b.onclick = ()=> startSession(parseInt(b.dataset.min,10));
+  });
+
+  /* コレクション */
+  if(D.owned.length){
+    const c = card(`<span class="eyebrow">COLLECTION</span><h2>旅の戦利品</h2><div class="choices"></div>`);
+    const box = c.querySelector(".choices");
+    D.owned.forEach(id=>{
+      const sty = STORY.find(s=>s.id===id), tip = TIP.find(t=>t.id===id);
+      if(sty){
+        const b = el(`<button>📖 ${esc(sty.title)}</button>`);
+        b.onclick = ()=> vStory(sty, ()=>vHome());
+        box.appendChild(b);
+      } else if(tip){
+        box.appendChild(el(`<div class="statrow"><span class="k">💬 <b>${esc(tip.en)}</b></span></div>`));
+      }
+    });
+  }
+
+  const foot = el(`<div class="homefoot">
+    <button data-a="backup">バックアップをコピー</button>
+    <button data-a="anchor">きっかけを変更</button>
+    <button data-a="reset">データをリセット</button>
+  </div>`);
+  foot.querySelector('[data-a=backup]').onclick = (e)=> copyText(exportCode(), e.target);
+  foot.querySelector('[data-a=anchor]').onclick = ()=>{ D.profile.onboarded=false; save(); vOnboard(); };
+  foot.querySelector('[data-a=reset]').onclick = ()=>{ if(confirm("学習記録をすべて消去しますか?この操作は戻せません。")){ try{ localStorage.removeItem(KEY); }catch(e){} idbClear(); setTimeout(()=>location.reload(), 200); } };
+  app.appendChild(foot);
+}
+
+function speedGraphSVG(logs){
+  const pts = logs.slice(-30);
+  const W=560, H=140, PAD=26;
+  const maxY = Math.max(6, Math.ceil(Math.max(...pts.map(p=>p.medSec))));
+  const x = i => PAD + (pts.length===1 ? (W-2*PAD)/2 : i*(W-2*PAD)/(pts.length-1));
+  const y = v => H-18 - (v/maxY)*(H-34);
+  let poly = pts.map((p,i)=>`${x(i).toFixed(1)},${y(p.medSec).toFixed(1)}`).join(" ");
+  const ty = y(TARGET_SEC);
+  return `<svg class="graph" viewBox="0 0 ${W} ${H}" role="img" aria-label="反射速度の推移グラフ">
+    <line x1="${PAD}" y1="${ty}" x2="${W-PAD}" y2="${ty}" stroke="var(--ok)" stroke-dasharray="4 4" stroke-width="1.5"/>
+    <text x="${W-PAD}" y="${ty-5}" text-anchor="end" font-size="10" fill="var(--ok)">目標 3.0秒</text>
+    <polyline points="${poly}" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${pts.map((p,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(p.medSec).toFixed(1)}" r="${i===pts.length-1?5:3}" fill="var(--accent)"/>`).join("")}
+    <text x="${PAD}" y="${H-4}" font-size="10" fill="var(--sub)">← 過去</text>
+    <text x="${W-PAD}" y="${H-4}" text-anchor="end" font-size="10" fill="var(--sub)">最新 →</text>
+  </svg>`;
+}
+
+/* =====================================================
+   セッション実行
+===================================================== */
+let SESSION = null;
+
+function startSession(minutes){
+  const queue = buildQueue(minutes);
+  if(!queue.length){
+    alert("今日の復習も新規もありません。また明日どうぞ!");
+    return;
+  }
+  SESSION = {min:minutes, t0:Date.now(), queue, done:0, secs:[], idx:0, over:false};
+  stepSession();
+}
+function sessionElapsedMin(){ return (Date.now()-SESSION.t0)/60000; }
+function updateMeta(){
+  const remain = Math.max(0, SESSION.min - sessionElapsedMin());
+  metaEl.textContent = `残り ${Math.ceil(remain)}分 ・ ${SESSION.done}枚`;
+}
+
+function stepSession(){
+  // 時間切れ判定(カードの切れ目でのみ終了)
+  if(sessionElapsedMin() >= SESSION.min || SESSION.idx >= SESSION.queue.length){
+    endSession(); return;
+  }
+  const cardDef = SESSION.queue[SESSION.idx];
+  SESSION.idx++;
+  clear(); updateMeta();
+  drawProgress();
+  if(cardDef.t==="sent") vSentCard(cardDef);
+  else if(cardDef.t==="chunk") vChunkCard(cardDef);
+  else if(cardDef.t==="listen") vListenCard(cardDef);
+  else if(cardDef.t==="shadow") vShadowCard(cardDef);
+}
+function drawProgress(){
+  const pct = Math.min(100, Math.round(sessionElapsedMin()/SESSION.min*100));
+  app.appendChild(el(`<div class="progressbar"><i style="width:${pct}%"></i></div>`));
+}
+
+/* --- 瞬間英作文カード --- */
+let cardTimerId = null;
+function vSentCard(def){
+  const it = def.item; it._type="sent";
+  const s = st(it.id);
+  const useMode2 = currentWeek()>=8 && s.ivl>=7 && it.q; // 8週目に解禁される「英語で聞かれるモード」
+  const why = whyText(it.id, !!def.isNew, it);
+
+  const c = card(`
+    <span class="eyebrow">瞬間英作文${useMode2?" ・ 英語で返すモード":""}</span>
+    <span class="why">📌 ${esc(why)}</span>
+    ${useMode2
+      ? `<p class="sub" style="margin-bottom:2px">🔊 質問が流れます。<b>英語で</b>声に出して答えてください。</p>
+         <button class="play-btn small" data-act="playq">▶ 質問を聞く</button>`
+      : `<p class="sub" style="margin-bottom:2px">声に出して英語で言ってください(小声でOK)。言えたらすぐタップ。</p>
+         <div class="prompt-ja">${esc(it.ja)}</div>`}
+    <div class="timer">0.0 秒</div>
+    <div class="btn-row">
+      <button class="btn-primary" data-act="said">言えた!</button>
+      <button class="btn-ghost" data-act="fail">出てこなかった</button>
+    </div>
+    <div class="fbslot"></div>
+  `);
+  const timerEl = c.querySelector(".timer");
+  const t0 = performance.now();
+  clearInterval(cardTimerId);
+  cardTimerId = setInterval(()=>{ timerEl.textContent = ((performance.now()-t0)/1000).toFixed(1)+" 秒"; }, 100);
+  if(useMode2){
+    const pq = c.querySelector('[data-act=playq]');
+    pq.onclick = ()=> speak(it.q, D.profile.listenRate);
+    speak(it.q, D.profile.listenRate);
+  }
+
+  function reveal(said){
+    clearInterval(cardTimerId);
+    const sec = (performance.now()-t0)/1000;
+    c.querySelectorAll(".btn-row button").forEach(b=>b.disabled=true);
+    const slot = c.querySelector(".fbslot");
+    slot.appendChild(el(`<div class="model-answer">
+      ${useMode2?`<div class="alt">Q: ${esc(it.q)}</div>`:""}
+      <div class="en">${esc(it.en)}</div>
+      ${it.alt?`<div class="alt">${esc(it.alt)}</div>`:""}
+    </div>`));
+    const lb = el(`<div class="btn-row"><button class="play-btn small" style="flex:0 0 auto">🔊 聞く</button></div>`);
+    lb.querySelector("button").onclick = ()=> speak(it.en, 0.95);
+    slot.appendChild(lb);
+    speak(it.en, 0.95);
+    if(said){
+      const g = el(`<div class="choices">
+        <p class="sub" style="margin:8px 0 0">自分の答えは?</p>
+        <button data-r="good">◎ だいたい合ってた</button>
+        <button data-r="hard">△ 惜しい</button>
+        <button data-r="again">✕ けっこう違った</button>
+      </div>`);
+      g.querySelectorAll("button").forEach(b=>{
+        b.onclick = ()=>{
+          grade(it.id, b.dataset.r, sec);
+          SESSION.done++;
+          if(b.dataset.r==="good") SESSION.secs.push(sec);
+          if(b.dataset.r==="again") requeue(def);
+          stepSession();
+        };
+      });
+      slot.appendChild(g);
+    } else {
+      const nb = el(`<div class="choices"><button class="btn-primary">口に出してから次へ</button></div>`);
+      nb.querySelector("button").onclick = ()=>{
+        grade(it.id, "again", null);
+        SESSION.done++;
+        requeue(def);
+        stepSession();
+      };
+      slot.appendChild(nb);
+    }
+  }
+  c.querySelector('[data-act=said]').onclick = ()=>reveal(true);
+  c.querySelector('[data-act=fail]').onclick = ()=>reveal(false);
+}
+function requeue(def){
+  // ✕だったカードは同セッション内でもう一度(3枚後ろへ)
+  const pos = Math.min(SESSION.queue.length, SESSION.idx+3);
+  SESSION.queue.splice(pos, 0, {t:def.t, item:def.item});
+}
+
+/* --- チャンクカード --- */
+function vChunkCard(def){
+  const it = def.item; it._type="chunk";
+  const s = st(it.id);
+  const why = whyText(it.id, !!def.isNew, it);
+  const kindLabel = {phr:"句動詞",word:"旅のことば",talk:"雑談のかたまり"}[it.kind];
+
+  if(s.stage===0){
+    // 認識ステージ: 英→日 3択(選択肢は他カードから)
+    const wrongs = CHUNK.filter(x=>x.id!==it.id && x.kind===it.kind).sort(()=>Math.random()-0.5).slice(0,2).map(x=>x.ja);
+    const opts = [it.ja, ...wrongs].sort(()=>Math.random()-0.5);
+    const c = card(`
+      <span class="eyebrow">${kindLabel} ・ 意味は?</span>
+      <span class="why">📌 ${esc(why)}</span>
+      <div class="prompt-en">${esc(it.en)}</div>
+      <div class="choices"></div>
+    `);
+    speak(it.en.replace(/〜/g,""), 0.95);
+    const box = c.querySelector(".choices");
+    opts.forEach(o=>{
+      const b = el(`<button class="choice">${esc(o)}</button>`);
+      b.onclick = ()=>{
+        const correct = o===it.ja;
+        box.querySelectorAll("button").forEach(x=>{ x.disabled=true; if(x.textContent===it.ja) x.classList.add("correct"); });
+        if(!correct) b.classList.add("wrong");
+        const fb = el(`<div class="chunk-ex"><span class="en">${esc(it.ex)}</span><br>${esc(it.exJa)}</div>`);
+        c.appendChild(fb);
+        speak(it.ex, 0.9);
+        if(correct) s.stage = 1; // 次回から想起ステージへ
+        grade(it.id, correct?"good":"again", null);
+        SESSION.done++;
+        if(!correct) requeue(def);
+        const nb = el(`<div class="choices"><button class="btn-primary">次へ</button></div>`);
+        nb.querySelector("button").onclick = ()=>stepSession();
+        c.appendChild(nb);
+      };
+      box.appendChild(b);
+    });
+  } else {
+    // 想起ステージ: 日→英を口に出す
+    const c = card(`
+      <span class="eyebrow">${kindLabel} ・ 英語で言うと?</span>
+      <span class="why">📌 ${esc(why)}</span>
+      <p class="sub" style="margin-bottom:2px">声に出してから、めくってください。</p>
+      <div class="prompt-ja">「${esc(it.ja)}」</div>
+      <div class="choices"><button class="btn-primary" data-act="flip">めくる</button></div>
+      <div class="fbslot"></div>
+    `);
+    c.querySelector('[data-act=flip]').onclick = (e)=>{
+      e.target.disabled = true;
+      const slot = c.querySelector(".fbslot");
+      slot.appendChild(el(`<div class="model-answer">
+        <div class="en">${esc(it.en)}</div>
+        <div class="alt">${esc(it.ex)}<br>${esc(it.exJa)}</div>
+      </div>`));
+      speak(it.ex, 0.9);
+      const g = el(`<div class="choices">
+        <button data-r="good">◎ 出てきた</button>
+        <button data-r="hard">△ 惜しい</button>
+        <button data-r="again">✕ 出てこなかった</button>
+      </div>`);
+      g.querySelectorAll("button").forEach(b=>{
+        b.onclick = ()=>{
+          grade(it.id, b.dataset.r, null);
+          SESSION.done++;
+          if(b.dataset.r==="again") requeue(def);
+          stepSession();
+        };
+      });
+      slot.appendChild(g);
+    };
+  }
+}
+
+/* --- リスニングカード --- */
+function vListenCard(def){
+  const it = def.item;
+  const rate = D.profile.listenRate;
+  let plays = 0; const MAXPLAY = 3;
+  const c = card(`
+    <span class="eyebrow">きく ・ SPEED ${rate.toFixed(2)}x</span>
+    <p class="sub" style="margin-bottom:8px">聞き取れたら答えを選んでください(${MAXPLAY}回まで)。</p>
+    <button class="play-btn">▶ 再生(あと${MAXPLAY}回)</button>
+    <p class="sub" style="margin:10px 0 0">${esc(it.q)}</p>
+    <div class="choices"></div>
+  `);
+  const pb = c.querySelector(".play-btn");
+  pb.onclick = ()=>{
+    if(plays>=MAXPLAY) return;
+    plays++;
+    pb.textContent = plays>=MAXPLAY ? "▶ 再生回数を使い切りました" : `▶ 再生(あと${MAXPLAY-plays}回)`;
+    if(plays>=MAXPLAY) pb.disabled = true;
+    speak(it.text, rate);
+  };
+  const box = c.querySelector(".choices");
+  it.ch.forEach((o,i)=>{
+    const b = el(`<button class="choice">${esc(o)}</button>`);
+    b.onclick = ()=>{
+      if(plays===0){ pb.click(); return; }
+      const correct = i===it.a;
+      box.querySelectorAll("button").forEach((x,xi)=>{ x.disabled=true; if(xi===it.a) x.classList.add("correct"); });
+      if(!correct) b.classList.add("wrong");
+      // 速度の自動調整
+      D.profile.listenRate = Math.round(Math.min(1.3, Math.max(0.7, rate + (correct?0.02:-0.03)))*100)/100;
+      D.profile.listenIdx = (D.profile.listenIdx+1) % LISTEN.length;
+      SESSION.done++;
+      // スクリプト表示
+      c.appendChild(el(`<div class="chunk-ex"><span class="en">${esc(it.text)}</span></div>`));
+      save();
+      const nb = el(`<div class="choices"><button class="btn-primary">次へ</button></div>`);
+      nb.querySelector("button").onclick = ()=>stepSession();
+      c.appendChild(nb);
+    };
+    box.appendChild(b);
+  });
+}
+
+/* --- シャドーイングカード --- */
+function vShadowCard(def){
+  const it = def.item;
+  const c = card(`
+    <span class="eyebrow">シャドーイング ・ ${esc(it.title)}</span>
+    <p class="sub">再生ボタンを押し、流れる英語に<b>0.5秒遅れでかぶせて</b>声に出します。1行ずつ、計2周が目安。文字を見ながらでOK。</p>
+    <div class="lines"></div>
+    <div class="choices"><button class="btn-primary" data-act="done">やり切った(次へ)</button></div>
+  `);
+  const box = c.querySelector(".lines");
+  it.lines.forEach(L=>{
+    const row = el(`<div class="shadow-line">
+      <div class="t"><div class="en">${esc(L.en)}</div><div class="ja">${esc(L.ja)}</div></div>
+      <button class="play-btn small" style="width:auto">▶</button>
+    </div>`);
+    row.querySelector("button").onclick = ()=> speak(L.en, Math.min(1.0, D.profile.listenRate));
+    box.appendChild(row);
+  });
+  c.querySelector('[data-act=done]').onclick = ()=>{
+    D.profile.shadowIdx = (D.profile.shadowIdx+1) % SHADOW.length;
+    SESSION.done++;
+    save();
+    stepSession();
+  };
+}
+
+/* =====================================================
+   セッション終了・ご褒美
+===================================================== */
+function endSession(){
+  clear(); metaEl.textContent="";
+  const med = medianOf(SESSION.secs);
+  D.log.push({d:todayStr(), n:SESSION.done, medSec:med!=null?Math.round(med*10)/10:null, min:SESSION.min});
+  if(D.log.length>200) D.log.shift();
+  save();
+
+  let medHtml = "";
+  if(med!=null){
+    const prevLogs = D.log.filter(l=>l.medSec!=null);
+    let deltaTxt = "";
+    if(prevLogs.length>=2){
+      const diff = Math.round((prevLogs[prevLogs.length-1].medSec - prevLogs[prevLogs.length-2].medSec)*10)/10;
+      deltaTxt = diff<0 ? `<span class="delta down">前回より ${Math.abs(diff).toFixed(1)}秒 速くなっています</span>`
+               : diff>0 ? `<span class="delta up">前回より ${diff.toFixed(1)}秒 ゆっくりでした(疲れている日はそういうものです)</span>` : "前回と同じ速さでした";
+    }
+    medHtml = `<div class="big-metric"><span class="num">${med.toFixed(1)}</span><span class="unit">秒</span></div>
+      <p class="sub">今日の「言えるまで」中央値 ${deltaTxt}</p>`;
+  }
+  card(`
+    <span class="eyebrow">おつかれさま</span>
+    <h1>今日の分は、ここで終わりです</h1>
+    ${medHtml}
+    <div class="statrow"><span class="k">こなしたカード</span><span class="v">${SESSION.done}枚</span></div>
+    <div class="statrow"><span class="k">かかった時間</span><span class="v">${Math.max(1,Math.round(sessionElapsedMin()))}分</span></div>
+    <p class="sub" style="margin-top:10px">「もう少しできたのに」くらいでやめるのが、明日もやれるコツです。</p>
+  `);
+
+  /* バックアップ(1タップ)。アプリ更新時はここから復元する */
+  const bk = card(`
+    <h2>💾 バックアップ</h2>
+    <p class="sub">今日の記録を含む全データのコードです。ときどきコピーしてメモアプリ等に貼っておくと、アプリが更新されて記録が見えなくなっても10秒で復元できます。</p>
+    <div class="choices"><button class="btn-primary" data-act="copy">バックアップコードをコピー</button></div>
+  `);
+  bk.querySelector('[data-act=copy]').onclick = (e)=> copyText(exportCode(), e.target);
+
+  // 変動報酬: 35%(初回は100%)
+  const unownedS = STORY.filter(s=>!D.owned.includes(s.id));
+  const unownedT = TIP.filter(t=>!D.owned.includes(t.id));
+  const pool = [...unownedS, ...unownedT];
+  const firstTime = D.log.length===1;
+  if(pool.length && (firstTime || Math.random()<0.35)){
+    const prize = pool[Math.floor(Math.random()*pool.length)];
+    D.owned.push(prize.id); save();
+    if(prize.text){ // story
+      const c = card(`
+        <span class="eyebrow">🎁 旅の戦利品</span>
+        <h2>ミニストーリー「${esc(prize.title)}」を手に入れた</h2>
+        <p class="sub">今のあなたのレベルで読める・聞ける旅の小話です。ホームの「旅の戦利品」からいつでも聞き直せます。</p>
+        <div class="choices"><button class="btn-primary">読む・聞く</button></div>
+      `,"reward");
+      c.querySelector("button").onclick = ()=> vStory(prize, ()=>vHome());
+    } else {
+      card(`
+        <span class="eyebrow">🎁 旅の戦利品</span>
+        <h2>現地のリアルフレーズ</h2>
+        <div class="prompt-en">${esc(prize.en)}</div>
+        <p>${esc(prize.ja)}</p>
+      `,"reward");
+    }
+  }
+
+  const back = el(`<div class="choices"><button class="btn-ghost">ホームへ戻る</button></div>`);
+  back.querySelector("button").onclick = ()=>vHome();
+  app.appendChild(back);
+}
+
+function vStory(sty, onBack){
+  clear();
+  const c = card(`
+    <span class="eyebrow">📖 ミニストーリー</span>
+    <h1>${esc(sty.title)}</h1>
+    <button class="play-btn small" style="width:auto">🔊 聞く(${D.profile.listenRate.toFixed(2)}x)</button>
+    <p class="story-text">${esc(sty.text)}</p>
+    <p class="sub">あらすじ: ${esc(sty.ja)}</p>
+    <div class="choices"><button class="btn-ghost" data-act="back">戻る</button></div>
+  `);
+  c.querySelector(".play-btn").onclick = ()=> speak(sty.text, D.profile.listenRate);
+  c.querySelector('[data-act=back]').onclick = onBack;
+}
+
+/* =====================================================
+   起動
+===================================================== */
+(async ()=>{
+  try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+  // GitHub Pages配信時のみ有効になるオフライン対応(Artifact上では silently fail)
+  try{ if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{}); }catch(e){}
+  // localStorageが空でもIndexedDBに残っていれば自動復旧
+  if(!load()){
+    const j = await idbGet();
+    if(j){ try{ const d = JSON.parse(j); if(d && d.profile){ D = normalize(d); save(); } }catch(e){} }
+  }
+  if(!D.profile.onboarded && D.totalReviews===0) vWelcome();
+  else if(!D.profile.onboarded) vOnboard();
+  else vHome();
+})();
 </script>
 </body>
 </html>
