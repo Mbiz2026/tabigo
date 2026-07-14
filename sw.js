@@ -1,7 +1,8 @@
 /* タビゴ Service Worker — ネットワーク優先・オフライン時はキャッシュ
    アプリを更新したら CACHE のバージョン番号を必ず上げること(docs/modify_app.md) */
-const CACHE = "tabigo-v1";
-const ASSETS = ["./", "./index.html", "./diagnose.html", "./manifest.webmanifest"];
+const CACHE = "tabigo-v2";
+const ASSETS = ["./", "./index.html", "./diagnose.html", "./manifest.webmanifest",
+  "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));

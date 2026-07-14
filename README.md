@@ -56,7 +56,8 @@
 ## ホスティング
 
 本番はGitHub Pages(tabigo移行後: https://mbiz2026.github.io/tabigo/ )。
-`sw.js`(オフライン対応)と `manifest.webmanifest`(ホーム画面アプリ化)を同梱。
+`sw.js`(オフライン対応)、`manifest.webmanifest`+アイコン3種(PWA=ホーム画面から
+全画面起動する普通のアプリとして動作)を同梱。
 Claude Artifactでの配信は保存領域が消える事象が実地で確認されたため廃止予定。
 学習データは端末内保存(localStorage+IndexedDB二重化)+バックアップコード。
 
