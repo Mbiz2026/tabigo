@@ -1,6 +1,6 @@
 /* タビゴ Service Worker — ネットワーク優先・オフライン時はキャッシュ
    アプリを更新したら CACHE のバージョン番号を必ず上げること(docs/modify_app.md) */
-const CACHE = "tabigo-v7";
+const CACHE = "tabigo-v8";
 const ASSETS = ["./", "./index.html", "./diagnose.html", "./manifest.webmanifest",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
