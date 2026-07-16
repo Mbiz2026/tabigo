@@ -529,17 +529,6 @@ function pickVoiceJa(){
   return voiceJaCache;
 }
 if(window.speechSynthesis){ speechSynthesis.onvoiceschanged = ()=>{ voiceCache=null; voiceJaCache=null; pickVoice(); }; }
-function waitForJaVoice(timeoutMs){
-  return new Promise(resolve=>{
-    const v = pickVoiceJa();
-    if(v) return resolve(v);
-    const start = Date.now();
-    const iv = setInterval(()=>{
-      const vv = pickVoiceJa();
-      if(vv || Date.now()-start > timeoutMs){ clearInterval(iv); resolve(vv); }
-    }, 150);
-  });
-}
 function speakAsync(text, rate, ja){
   return new Promise(res=>{
     if(!window.speechSynthesis) return res();
@@ -1011,11 +1000,9 @@ function vShadowCard(def){
 ===================================================== */
 let DRIVE = null;
 
-async function startDrive(minutes){
+function startDrive(minutes){
   if(!window.speechSynthesis){ alert("この端末では音声合成が使えないため、ドライブモードを開始できません。"); return; }
-  pickVoice();
-  const vJa = await waitForJaVoice(1500);
-  if(!vJa){ alert("日本語の読み上げ音声がこの端末に見つからないため、ドライブモードを開始できません。"); return; }
+  pickVoice(); pickVoiceJa();
   // 出題リスト: 期限切れ復習 → 学習済み → 未習の基礎、の順(文は最大30・チャンクは最大10)
   const seenS = availableSents().filter(x=>D.srs[x.id] && D.srs[x.id].reps>0);
   const dueS = seenS.filter(x=>isDue(x.id));
