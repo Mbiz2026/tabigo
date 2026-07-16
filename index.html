@@ -473,8 +473,8 @@ function buildQueue(minutes, mode){
     dueC.forEach(x=>q.push({t:"chunk", item:x}));
     // 新規(夜は出さない)
     if(!evening){
-      const nS = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
-      const nC = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
+      const nS = minutes>=20?5: minutes>=10?4: (q.length===0?2:0);
+      const nC = minutes>=20?5: minutes>=10?4: (q.length===0?2:0);
       // 文の新規: 診断で遅かったレベル順(4,3,2,1)ではなく、基礎から固めつつ週テーマ順
       const newS = availableSents().filter(x=>isNew(x.id)).slice(0, nS);
       // チャンク新規: pri優先
@@ -691,14 +691,23 @@ function vHome(){
       <button data-min="10"><span class="m-min">10<small>分</small></span><span class="m-desc">復習+新規<br>+リスニング</span></button>
       <button data-min="20"><span class="m-min">20<small>分</small></span><span class="m-desc">フル<br>+声を出す練習</span></button>
     </div>
+    <div class="choices" data-role="drive-start" style="display:none">
+      <button class="btn-primary">▶ ドライブ開始(終了を押すまで流れ続けます)</button>
+    </div>
   `);
   let curMode = "mix";
+  const mgEl = menu.querySelector(".menu-grid");
+  const dsEl = menu.querySelector('[data-role=drive-start]');
   menu.querySelectorAll("[data-mode]").forEach(b=>{
     b.onclick = ()=>{
       curMode = b.dataset.mode;
       menu.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("sel", x===b));
+      const drv = curMode === "drive";
+      mgEl.style.display = drv ? "none" : "grid";
+      dsEl.style.display = drv ? "flex" : "none";
     };
   });
+  dsEl.querySelector("button").onclick = ()=> startSession(0, "drive");
   menu.querySelectorAll("[data-min]").forEach(b=>{
     b.onclick = ()=> startSession(parseInt(b.dataset.min,10), curMode);
   });
@@ -755,7 +764,7 @@ let SESSION = null;
 
 function startSession(minutes, mode){
   mode = mode || "mix";
-  if(mode === "drive"){ startDrive(minutes); return; }
+  if(mode === "drive"){ startDrive(); return; }
   const queue = buildQueue(minutes, mode);
   if(!queue.length){
     alert("今日の復習も新規もありません。また明日どうぞ!");
@@ -772,9 +781,9 @@ function updateMeta(){
 
 function stepSession(){
   // 時間切れ判定(カードの切れ目でのみ終了)
-  if(sessionElapsedMin() >= SESSION.min || SESSION.idx >= SESSION.queue.length){
-    endSession(); return;
-  }
+  if(sessionElapsedMin() >= SESSION.min){ endSession(); return; }
+  // 教材が尽きても時間が残っていれば自動補充(早終わりしない)
+  if(SESSION.idx >= SESSION.queue.length && !topUpQueue()){ endSession(); return; }
   const cardDef = SESSION.queue[SESSION.idx];
   SESSION.idx++;
   clear(); updateMeta();
@@ -787,6 +796,34 @@ function stepSession(){
 function drawProgress(){
   const pct = Math.min(100, Math.round(sessionElapsedMin()/SESSION.min*100));
   app.appendChild(el(`<div class="progressbar"><i style="width:${pct}%"></i></div>`));
+}
+
+/* 教材が尽きたときの自動補充: 選んだ時間まで途切れさせない */
+function topUpQueue(){
+  const used = new Set(SESSION.queue.filter(x=>x.item && x.item.id).map(x=>x.item.id));
+  const evening = isEvening();
+  const adds = [];
+  // 昼間: 未習カードを少しずつ追加(夜は新規を出さない原則を維持)
+  if(SESSION.mode !== "listen" && !evening){
+    availableSents().filter(x=>isNew(x.id) && !used.has(x.id)).slice(0, 2)
+      .forEach(x=>adds.push({t:"sent", item:x, isNew:true}));
+    CHUNK.filter(x=>isNew(x.id) && !used.has(x.id)).sort((a,b)=>b.pri-a.pri).slice(0, 2)
+      .forEach(x=>adds.push({t:"chunk", item:x, isNew:true}));
+  }
+  // 今日◎にできなかったカード(期限が今日のまま)をもう一周
+  if(!adds.length && SESSION.mode !== "listen"){
+    const redoS = availableSents().filter(x=>isDue(x.id)).slice(0, 3);
+    const redoC = CHUNK.filter(x=>isDue(x.id)).slice(0, 3);
+    redoS.forEach(x=>adds.push({t:"sent", item:x}));
+    redoC.forEach(x=>adds.push({t:"chunk", item:x}));
+  }
+  // リスニングで埋める(はなすコース以外)
+  if(SESSION.mode !== "speak"){
+    adds.push({t:"listen", item:LISTEN[D.profile.listenIdx % LISTEN.length]});
+  }
+  if(!adds.length) return false;
+  SESSION.queue.push(...adds);
+  return true;
 }
 
 /* --- 瞬間英作文カード --- */
@@ -1022,24 +1059,26 @@ function vShadowCard(def){
 ===================================================== */
 let DRIVE = null;
 
-function startDrive(minutes){
+function startDrive(){
   if(!window.speechSynthesis){ alert("この端末では音声合成が使えないため、ドライブモードを開始できません。"); return; }
   // iOSは最初の読み上げがタップと同じ同期処理内にないと無音になる。
   // ここ(タップ直下)で空の発話を流して音声をアンロックしておく
   try{ speechSynthesis.cancel(); speechSynthesis.resume(); speechSynthesis.speak(new SpeechSynthesisUtterance("")); }catch(e){}
   pickVoice(); pickVoiceJa();
-  // 出題リスト: 期限切れ復習 → 学習済み → 未習の基礎、の順(文は最大30・チャンクは最大10)
+  // 出題リスト: 期限切れ復習 → 学習済み → 未習(耳での先行接触)。全教材を1周とする
   const seenS = availableSents().filter(x=>D.srs[x.id] && D.srs[x.id].reps>0);
   const dueS = seenS.filter(x=>isDue(x.id));
   const restS = seenS.filter(x=>!isDue(x.id));
   const padS = availableSents().filter(x=>isNew(x.id)).sort((a,b)=>a.lv-b.lv);
-  const S = [...dueS, ...restS, ...padS].slice(0, 30);
-  const C = CHUNK.filter(x=>D.srs[x.id] && D.srs[x.id].reps>0).slice(0, 10);
+  const S = [...dueS, ...restS, ...padS];
+  const seenC = CHUNK.filter(x=>D.srs[x.id] && D.srs[x.id].reps>0);
+  const newC = CHUNK.filter(x=>isNew(x.id)).sort((a,b)=>b.pri-a.pri);
+  const C = [...seenC, ...newC];
   const list = [];
   const n = Math.max(S.length, C.length);
   for(let i=0;i<n;i++){ if(S[i]) list.push({t:"sent", item:S[i]}); if(C[i]) list.push({t:"chunk", item:C[i]}); }
   if(!list.length){ alert("読み上げる教材がまだありません。まず通常のセッションを1回どうぞ。"); return; }
-  DRIVE = {min:minutes, t0:Date.now(), i:0, played:0, paused:false, stopped:false, lock:null, keep:null};
+  DRIVE = {t0:Date.now(), i:0, played:0, paused:false, stopped:false, lock:null, keep:null};
   // 無音ループもタップ直下で開始(iOSの自動再生制限を通すため)
   try{ DRIVE.keep = silentLoopAudio(); DRIVE.keep.play().catch(()=>{}); }catch(e){}
   vDrive(list);
@@ -1051,8 +1090,8 @@ async function vDrive(list){
   // iOSで無音になるため、待たずに取得だけ依頼して先へ進む
   try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(l=>{ if(DRIVE) DRIVE.lock = l; }).catch(()=>{}); }catch(e){}
   const c = card(`
-    <span class="eyebrow">ドライブモード ・ ${DRIVE.min}分</span>
-    <p class="sub">「日本語 →(声に出す間)→ 英語×2」が自動で流れ続けます。画面は見なくてOK。<b>操作は停車中に。</b>音が出ないときは本体横のサイレントスイッチ(消音)と音量を確認してください。</p>
+    <span class="eyebrow">ドライブモード</span>
+    <p class="sub">「日本語 →(声に出す間)→ 英語×2」が<b>終了を押すまで</b>流れ続けます(全${list.length}枚で1周、2周目からは順番シャッフル)。画面は見なくてOK。<b>操作は停車中に。</b>音が出ないときは本体横のサイレントスイッチ(消音)と音量を確認してください。</p>
     <button class="drive-main" data-act="toggle">⏸ 一時停止</button>
     <p class="sub" style="text-align:center;margin-top:10px" data-role="st">再生をはじめます…</p>
     <div class="choices"><button class="btn-ghost" data-act="quit">終了する</button></div>
@@ -1067,7 +1106,7 @@ async function vDrive(list){
     try{ if("mediaSession" in navigator) navigator.mediaSession.playbackState = p ? "paused" : "playing"; }catch(e){}
   };
   tg.onclick = ()=> setPaused(!DRIVE.paused);
-  c.querySelector('[data-act=quit]').onclick = ()=> finishDrive(true);
+  c.querySelector('[data-act=quit]').onclick = ()=> finishDrive();
   // イヤホンの再生/停止ボタンで一時停止・再開できるようにする(画面を触らない)
   try{
     if("mediaSession" in navigator){
@@ -1079,15 +1118,18 @@ async function vDrive(list){
   }catch(e){}
 
   const bail = ()=> DRIVE.stopped || DRIVE.paused;
-  const elapsedMin = ()=> (Date.now()-DRIVE.t0)/60000;
   // Bluetooth接続の起動を待ってから1枚目を読む(頭欠け防止)。
   // 音声のアンロック発話はstartDriveのタップ直下で済んでいるため、ここで待っても無音にはならない
   await sleepMs(800);
-  while(!DRIVE.stopped && elapsedMin() < DRIVE.min){
+  while(!DRIVE.stopped){
     if(DRIVE.paused){ await sleepMs(400); continue; }
+    if(DRIVE.i > 0 && DRIVE.i % list.length === 0){
+      list.sort(()=>Math.random()-0.5); // 2周目以降はシャッフル
+    }
     const def = list[DRIVE.i % list.length];
     DRIVE.i++;
-    stEl.textContent = `${DRIVE.i}枚目を再生中(タップ不要)`;
+    const lap = Math.floor((DRIVE.i-1) / list.length) + 1;
+    stEl.textContent = `${lap}周目 ${((DRIVE.i-1) % list.length)+1} / ${list.length} 枚(タップ不要)`;
     const it = def.item;
     if(def.t === "sent"){
       await speakAsync(it.ja, 1.0, true);            if(bail()) continue;
@@ -1105,18 +1147,15 @@ async function vDrive(list){
     DRIVE.played++;
     await sleepMs(900);
   }
-  if(!DRIVE.stopped) finishDrive(false);
 }
 
-function finishDrive(manual){
+function finishDrive(){
   if(!DRIVE || DRIVE.stopped) return;
   DRIVE.stopped = true;
   try{ speechSynthesis.cancel(); }catch(e){}
   try{ if(DRIVE.lock) DRIVE.lock.release(); }catch(e){}
   const keep = DRIVE.keep; DRIVE.keep = null;
-  const stopKeep = ()=>{ try{ if(keep){ keep.pause(); URL.revokeObjectURL(keep.src); } }catch(e){} };
-  // 自動終了時は「おつかれさま」の読み上げが終わるまで接続を保ってから止める
-  if(manual) stopKeep(); else setTimeout(stopKeep, 12000);
+  try{ if(keep){ keep.pause(); URL.revokeObjectURL(keep.src); } }catch(e){}
   try{
     if("mediaSession" in navigator){
       navigator.mediaSession.playbackState = "none";
@@ -1128,7 +1167,6 @@ function finishDrive(manual){
   D.log.push({d:todayStr(), n:DRIVE.played, medSec:null, min:mins, mode:"drive"});
   if(D.log.length>200) D.log.shift();
   save();
-  if(!manual) speakAsync("おつかれさまでした。今日のドライブレッスンはここまでです。", 1.0, true);
   clear(); metaEl.textContent = "";
   const c = card(`
     <span class="eyebrow">おつかれさま</span>
