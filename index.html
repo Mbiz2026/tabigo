@@ -546,6 +546,23 @@ function speakAsync(text, rate, ja){
   });
 }
 function sleepMs(ms){ return new Promise(r=>setTimeout(r, ms)); }
+/* Bluetoothイヤホンは無音が続くと省電力スリープに入り、次の読み上げの
+   頭が欠ける。完全無音のWAVをループ再生して接続を保つ(ドライブモード用)。
+   iOSはaudio.volumeを無視するため、データ自体が無音であることが必須 */
+function silentLoopAudio(){
+  const rate = 8000, n = rate, header = 44;
+  const buf = new ArrayBuffer(header + n), dv = new DataView(buf);
+  const w = (o,s)=>{ for(let i=0;i<s.length;i++) dv.setUint8(o+i, s.charCodeAt(i)); };
+  w(0,"RIFF"); dv.setUint32(4, 36+n, true); w(8,"WAVEfmt ");
+  dv.setUint32(16,16,true); dv.setUint16(20,1,true); dv.setUint16(22,1,true);
+  dv.setUint32(24,rate,true); dv.setUint32(28,rate,true);
+  dv.setUint16(32,1,true); dv.setUint16(34,8,true);
+  w(36,"data"); dv.setUint32(40,n,true);
+  for(let i=0;i<n;i++) dv.setUint8(header+i, 128);
+  const a = new Audio(URL.createObjectURL(new Blob([buf], {type:"audio/wav"})));
+  a.loop = true;
+  return a;
+}
 function speak(text, rate){
   if(!window.speechSynthesis) return;
   const u = new SpeechSynthesisUtterance(text);
@@ -1022,7 +1039,9 @@ function startDrive(minutes){
   const n = Math.max(S.length, C.length);
   for(let i=0;i<n;i++){ if(S[i]) list.push({t:"sent", item:S[i]}); if(C[i]) list.push({t:"chunk", item:C[i]}); }
   if(!list.length){ alert("読み上げる教材がまだありません。まず通常のセッションを1回どうぞ。"); return; }
-  DRIVE = {min:minutes, t0:Date.now(), i:0, played:0, paused:false, stopped:false, lock:null};
+  DRIVE = {min:minutes, t0:Date.now(), i:0, played:0, paused:false, stopped:false, lock:null, keep:null};
+  // 無音ループもタップ直下で開始(iOSの自動再生制限を通すため)
+  try{ DRIVE.keep = silentLoopAudio(); DRIVE.keep.play().catch(()=>{}); }catch(e){}
   vDrive(list);
 }
 
@@ -1040,15 +1059,30 @@ async function vDrive(list){
   `);
   const stEl = c.querySelector('[data-role=st]');
   const tg = c.querySelector('[data-act=toggle]');
-  tg.onclick = ()=>{
-    DRIVE.paused = !DRIVE.paused;
-    if(DRIVE.paused){ try{ speechSynthesis.cancel(); }catch(e){} tg.textContent = "▶ 再開"; }
-    else tg.textContent = "⏸ 一時停止";
+  const setPaused = (p)=>{
+    if(!DRIVE || DRIVE.stopped) return;
+    DRIVE.paused = p;
+    if(p){ try{ speechSynthesis.cancel(); }catch(e){} try{ if(DRIVE.keep) DRIVE.keep.pause(); }catch(e){} tg.textContent = "▶ 再開"; }
+    else { try{ if(DRIVE.keep) DRIVE.keep.play().catch(()=>{}); }catch(e){} tg.textContent = "⏸ 一時停止"; }
+    try{ if("mediaSession" in navigator) navigator.mediaSession.playbackState = p ? "paused" : "playing"; }catch(e){}
   };
+  tg.onclick = ()=> setPaused(!DRIVE.paused);
   c.querySelector('[data-act=quit]').onclick = ()=> finishDrive(true);
+  // イヤホンの再生/停止ボタンで一時停止・再開できるようにする(画面を触らない)
+  try{
+    if("mediaSession" in navigator){
+      navigator.mediaSession.metadata = new MediaMetadata({title:"タビゴ ドライブモード", artist:"英語トレーニング"});
+      navigator.mediaSession.setActionHandler("play", ()=> setPaused(false));
+      navigator.mediaSession.setActionHandler("pause", ()=> setPaused(true));
+      navigator.mediaSession.playbackState = "playing";
+    }
+  }catch(e){}
 
   const bail = ()=> DRIVE.stopped || DRIVE.paused;
   const elapsedMin = ()=> (Date.now()-DRIVE.t0)/60000;
+  // Bluetooth接続の起動を待ってから1枚目を読む(頭欠け防止)。
+  // 音声のアンロック発話はstartDriveのタップ直下で済んでいるため、ここで待っても無音にはならない
+  await sleepMs(800);
   while(!DRIVE.stopped && elapsedMin() < DRIVE.min){
     if(DRIVE.paused){ await sleepMs(400); continue; }
     const def = list[DRIVE.i % list.length];
@@ -1079,6 +1113,17 @@ function finishDrive(manual){
   DRIVE.stopped = true;
   try{ speechSynthesis.cancel(); }catch(e){}
   try{ if(DRIVE.lock) DRIVE.lock.release(); }catch(e){}
+  const keep = DRIVE.keep; DRIVE.keep = null;
+  const stopKeep = ()=>{ try{ if(keep){ keep.pause(); URL.revokeObjectURL(keep.src); } }catch(e){} };
+  // 自動終了時は「おつかれさま」の読み上げが終わるまで接続を保ってから止める
+  if(manual) stopKeep(); else setTimeout(stopKeep, 12000);
+  try{
+    if("mediaSession" in navigator){
+      navigator.mediaSession.playbackState = "none";
+      navigator.mediaSession.setActionHandler("play", null);
+      navigator.mediaSession.setActionHandler("pause", null);
+    }
+  }catch(e){}
   const mins = Math.max(1, Math.round((Date.now()-DRIVE.t0)/60000));
   D.log.push({d:todayStr(), n:DRIVE.played, medSec:null, min:mins, mode:"drive"});
   if(D.log.length>200) D.log.shift();
