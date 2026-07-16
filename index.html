@@ -88,6 +88,11 @@ button:active{background:var(--hl)}
 .menu-grid button{text-align:center;padding:16px 8px}
 .menu-grid .m-min{font-size:1.5rem;font-weight:800;display:block;font-variant-numeric:tabular-nums}
 .menu-grid .m-desc{font-size:.72rem;color:var(--sub);display:block;line-height:1.4;margin-top:2px}
+.mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.mode-grid button{text-align:center;padding:10px 4px;font-size:.88rem;font-weight:700}
+.mode-grid .m-desc{display:block;font-size:.62rem;color:var(--sub);font-weight:600;margin-top:2px}
+.mode-grid button.sel{border-color:var(--accent);background:var(--hl);color:var(--accent)}
+.drive-main{width:100%;min-height:38vh;font-size:1.5rem;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center;background:var(--accent);color:var(--accent-ink);border-color:var(--accent);border-radius:18px}
 .statrow{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--line);padding:7px 0;gap:12px}
 .statrow:last-child{border-bottom:none}
 .statrow .k{font-size:.88rem}
@@ -451,44 +456,46 @@ function whyText(id, isNewCard, item){
 ===================================================== */
 function availableSents(){ const w = currentWeek(); return SENT.filter(x=>x.wk<=Math.max(1,w)); }
 
-function buildQueue(minutes){
+function buildQueue(minutes, mode){
+  mode = mode || "mix";
   const evening = isEvening();
-  const q = [];
-  // 期限が来ている復習(文)
-  const dueS = availableSents().filter(x=>isDue(x.id));
-  // 期限が来ている復習(チャンク)
-  const dueC = CHUNK.filter(x=>isDue(x.id));
-  // 並べ替え: 遅延日数が大きい順
-  const byOverdue = (a,b)=> (D.srs[a.id].due < D.srs[b.id].due ? -1 : 1);
-  dueS.sort(byOverdue); dueC.sort(byOverdue);
-  dueS.forEach(x=>q.push({t:"sent", item:x}));
-  dueC.forEach(x=>q.push({t:"chunk", item:x}));
-  // 新規(夜は出さない)
-  if(!evening){
-    const nS = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
-    const nC = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
-    // 文の新規: 診断で遅かったレベル順(4,3,2,1)ではなく、基礎から固めつつ週テーマ順
-    const newS = availableSents().filter(x=>isNew(x.id)).slice(0, nS);
-    // チャンク新規: pri優先
-    const newC = CHUNK.filter(x=>isNew(x.id)).sort((a,b)=>b.pri-a.pri).slice(0, nC);
-    newS.forEach(x=>q.push({t:"sent", item:x, isNew:true}));
-    newC.forEach(x=>q.push({t:"chunk", item:x, isNew:true}));
-  }
-  // 文とチャンクを交互に混ぜる(インターリーブ)
-  const sents = q.filter(x=>x.t==="sent"), chunks = q.filter(x=>x.t==="chunk");
   const mixed = [];
-  const maxLen = Math.max(sents.length, chunks.length);
-  for(let i=0;i<maxLen;i++){ if(sents[i]) mixed.push(sents[i]); if(chunks[i]) mixed.push(chunks[i]); }
-  // リスニングを挟む(10分以上)
-  if(minutes>=10){
-    const nL = minutes>=20?3:2;
-    for(let i=0;i<nL;i++){
-      const item = LISTEN[(D.profile.listenIdx + i) % LISTEN.length];
-      const pos = Math.min(mixed.length, Math.round((i+1)*mixed.length/(nL+1)) + i);
-      mixed.splice(pos, 0, {t:"listen", item});
+  if(mode !== "listen"){
+    const q = [];
+    // 期限が来ている復習(文)
+    const dueS = availableSents().filter(x=>isDue(x.id));
+    // 期限が来ている復習(チャンク)
+    const dueC = CHUNK.filter(x=>isDue(x.id));
+    // 並べ替え: 遅延日数が大きい順
+    const byOverdue = (a,b)=> (D.srs[a.id].due < D.srs[b.id].due ? -1 : 1);
+    dueS.sort(byOverdue); dueC.sort(byOverdue);
+    dueS.forEach(x=>q.push({t:"sent", item:x}));
+    dueC.forEach(x=>q.push({t:"chunk", item:x}));
+    // 新規(夜は出さない)
+    if(!evening){
+      const nS = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
+      const nC = minutes>=20?4: minutes>=10?3: (q.length===0?2:0);
+      // 文の新規: 診断で遅かったレベル順(4,3,2,1)ではなく、基礎から固めつつ週テーマ順
+      const newS = availableSents().filter(x=>isNew(x.id)).slice(0, nS);
+      // チャンク新規: pri優先
+      const newC = CHUNK.filter(x=>isNew(x.id)).sort((a,b)=>b.pri-a.pri).slice(0, nC);
+      newS.forEach(x=>q.push({t:"sent", item:x, isNew:true}));
+      newC.forEach(x=>q.push({t:"chunk", item:x, isNew:true}));
     }
+    // 文とチャンクを交互に混ぜる(インターリーブ)
+    const sents = q.filter(x=>x.t==="sent"), chunks = q.filter(x=>x.t==="chunk");
+    const maxLen = Math.max(sents.length, chunks.length);
+    for(let i=0;i<maxLen;i++){ if(sents[i]) mixed.push(sents[i]); if(chunks[i]) mixed.push(chunks[i]); }
   }
-  // シャドーイング(20分)は最後
+  // リスニング: 「きく」は主役、ミックスは10分以上で挟む、「はなす」は無し
+  const nL = mode==="listen" ? (minutes>=20?10: minutes>=10?7:4)
+           : (mode==="mix" && minutes>=10 ? (minutes>=20?3:2) : 0);
+  for(let i=0;i<nL;i++){
+    const item = LISTEN[(D.profile.listenIdx + i) % LISTEN.length];
+    const pos = Math.min(mixed.length, Math.round((i+1)*mixed.length/(nL+1)) + i);
+    mixed.splice(pos, 0, {t:"listen", item});
+  }
+  // シャドーイング(20分)は最後(全コース共通)
   if(minutes>=20){
     mixed.push({t:"shadow", item:SHADOW[D.profile.shadowIdx % SHADOW.length]});
   }
@@ -514,7 +521,26 @@ function pickVoice(){
   voiceCache = en.find(v=>v.lang==="en-US") || en.find(v=>v.lang==="en-GB") || en[0] || null;
   return voiceCache;
 }
-if(window.speechSynthesis){ speechSynthesis.onvoiceschanged = ()=>{ voiceCache=null; pickVoice(); }; }
+let voiceJaCache = null;
+function pickVoiceJa(){
+  if(voiceJaCache) return voiceJaCache;
+  const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  voiceJaCache = vs.find(v=>v.lang && v.lang.toLowerCase().startsWith("ja")) || null;
+  return voiceJaCache;
+}
+if(window.speechSynthesis){ speechSynthesis.onvoiceschanged = ()=>{ voiceCache=null; voiceJaCache=null; pickVoice(); }; }
+function speakAsync(text, rate, ja){
+  return new Promise(res=>{
+    if(!window.speechSynthesis) return res();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = ja ? pickVoiceJa() : pickVoice();
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = ja ? "ja-JP" : "en-US";
+    u.rate = rate || 1.0;
+    u.onend = ()=>res(); u.onerror = ()=>res();
+    speechSynthesis.speak(u);
+  });
+}
+function sleepMs(ms){ return new Promise(r=>setTimeout(r, ms)); }
 function speak(text, rate){
   if(!window.speechSynthesis) return;
   const u = new SpeechSynthesisUtterance(text);
@@ -626,19 +652,33 @@ function vHome(){
 
   /* 今日のメニュー */
   const anchorTxt = D.profile.anchor ? `<p class="sub">きっかけ: ${esc(D.profile.anchor)}、タビゴを3分</p>` : "";
-  card(`
+  const menu = card(`
     <span class="eyebrow">TODAY</span>
     <h2>今日は何分?</h2>
     ${anchorTxt}
     ${evening ? `<p class="sub">🌙 21時以降なので新しい内容は出しません。復習だけで記憶を固めて寝ましょう。</p>` : ""}
     <p class="sub">${dueCount>0 ? `復習期限が来ているカード: <b>${dueCount}枚</b>` : "復習期限のカードはありません。新しい表現から始めます。"}</p>
+    <div class="mode-grid">
+      <button data-mode="mix" class="sel">ミックス<span class="m-desc">おまかせ</span></button>
+      <button data-mode="speak">はなす<span class="m-desc">英作文中心</span></button>
+      <button data-mode="listen">きく<span class="m-desc">耳を鍛える</span></button>
+      <button data-mode="drive">ドライブ<span class="m-desc">画面を見ない</span></button>
+    </div>
     <div class="menu-grid">
       <button data-min="3"><span class="m-min">3<small>分</small></span><span class="m-desc">復習だけ<br>布団の中でOK</span></button>
       <button data-min="10"><span class="m-min">10<small>分</small></span><span class="m-desc">復習+新規<br>+リスニング</span></button>
       <button data-min="20"><span class="m-min">20<small>分</small></span><span class="m-desc">フル<br>+声を出す練習</span></button>
     </div>
-  `).querySelectorAll("[data-min]").forEach(b=>{
-    b.onclick = ()=> startSession(parseInt(b.dataset.min,10));
+  `);
+  let curMode = "mix";
+  menu.querySelectorAll("[data-mode]").forEach(b=>{
+    b.onclick = ()=>{
+      curMode = b.dataset.mode;
+      menu.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("sel", x===b));
+    };
+  });
+  menu.querySelectorAll("[data-min]").forEach(b=>{
+    b.onclick = ()=> startSession(parseInt(b.dataset.min,10), curMode);
   });
 
   /* コレクション */
@@ -691,13 +731,15 @@ function speedGraphSVG(logs){
 ===================================================== */
 let SESSION = null;
 
-function startSession(minutes){
-  const queue = buildQueue(minutes);
+function startSession(minutes, mode){
+  mode = mode || "mix";
+  if(mode === "drive"){ startDrive(minutes); return; }
+  const queue = buildQueue(minutes, mode);
   if(!queue.length){
     alert("今日の復習も新規もありません。また明日どうぞ!");
     return;
   }
-  SESSION = {min:minutes, t0:Date.now(), queue, done:0, secs:[], idx:0, over:false};
+  SESSION = {min:minutes, t0:Date.now(), queue, done:0, secs:[], idx:0, over:false, mode};
   stepSession();
 }
 function sessionElapsedMin(){ return (Date.now()-SESSION.t0)/60000; }
@@ -953,12 +995,105 @@ function vShadowCard(def){
 }
 
 /* =====================================================
+   ドライブモード(画面を見ない音声ドリル)
+   自己採点が無いためSRSの記録には触れない(測定の純度を守る)
+===================================================== */
+let DRIVE = null;
+
+function startDrive(minutes){
+  if(!window.speechSynthesis){ alert("この端末では音声合成が使えないため、ドライブモードを開始できません。"); return; }
+  pickVoice(); pickVoiceJa();
+  if(!pickVoiceJa()){ alert("日本語の読み上げ音声がこの端末に見つからないため、ドライブモードを開始できません。"); return; }
+  // 出題リスト: 期限切れ復習 → 学習済み → 未習の基礎、の順(文は最大30・チャンクは最大10)
+  const seenS = availableSents().filter(x=>D.srs[x.id] && D.srs[x.id].reps>0);
+  const dueS = seenS.filter(x=>isDue(x.id));
+  const restS = seenS.filter(x=>!isDue(x.id));
+  const padS = availableSents().filter(x=>isNew(x.id)).sort((a,b)=>a.lv-b.lv);
+  const S = [...dueS, ...restS, ...padS].slice(0, 30);
+  const C = CHUNK.filter(x=>D.srs[x.id] && D.srs[x.id].reps>0).slice(0, 10);
+  const list = [];
+  const n = Math.max(S.length, C.length);
+  for(let i=0;i<n;i++){ if(S[i]) list.push({t:"sent", item:S[i]}); if(C[i]) list.push({t:"chunk", item:C[i]}); }
+  if(!list.length){ alert("読み上げる教材がまだありません。まず通常のセッションを1回どうぞ。"); return; }
+  DRIVE = {min:minutes, t0:Date.now(), i:0, played:0, paused:false, stopped:false, lock:null};
+  vDrive(list);
+}
+
+async function vDrive(list){
+  clear(); metaEl.textContent = "";
+  try{ if(navigator.wakeLock) DRIVE.lock = await navigator.wakeLock.request("screen"); }catch(e){}
+  const c = card(`
+    <span class="eyebrow">ドライブモード ・ ${DRIVE.min}分</span>
+    <p class="sub">「日本語 →(声に出す間)→ 英語×2」が自動で流れ続けます。画面は見なくてOK。<b>操作は停車中に。</b></p>
+    <button class="drive-main" data-act="toggle">⏸ 一時停止</button>
+    <p class="sub" style="text-align:center;margin-top:10px" data-role="st">再生をはじめます…</p>
+    <div class="choices"><button class="btn-ghost" data-act="quit">終了する</button></div>
+  `);
+  const stEl = c.querySelector('[data-role=st]');
+  const tg = c.querySelector('[data-act=toggle]');
+  tg.onclick = ()=>{
+    DRIVE.paused = !DRIVE.paused;
+    if(DRIVE.paused){ try{ speechSynthesis.cancel(); }catch(e){} tg.textContent = "▶ 再開"; }
+    else tg.textContent = "⏸ 一時停止";
+  };
+  c.querySelector('[data-act=quit]').onclick = ()=> finishDrive(true);
+
+  const bail = ()=> DRIVE.stopped || DRIVE.paused;
+  const elapsedMin = ()=> (Date.now()-DRIVE.t0)/60000;
+  while(!DRIVE.stopped && elapsedMin() < DRIVE.min){
+    if(DRIVE.paused){ await sleepMs(400); continue; }
+    const def = list[DRIVE.i % list.length];
+    DRIVE.i++;
+    stEl.textContent = `${DRIVE.i}枚目を再生中(タップ不要)`;
+    const it = def.item;
+    if(def.t === "sent"){
+      await speakAsync(it.ja, 1.0, true);            if(bail()) continue;
+      await sleepMs(2200 + it.lv*700);                if(bail()) continue;
+      await speakAsync(it.en, 0.9);                   if(bail()) continue;
+      await sleepMs(500);                             if(bail()) continue;
+      await speakAsync(it.en, 1.0);
+    } else {
+      await speakAsync(it.ja, 1.0, true);            if(bail()) continue;
+      await sleepMs(2400);                            if(bail()) continue;
+      await speakAsync(it.en.replace(/〜/g,""), 0.95); if(bail()) continue;
+      await sleepMs(400);                             if(bail()) continue;
+      await speakAsync(it.ex, 0.9);
+    }
+    DRIVE.played++;
+    await sleepMs(900);
+  }
+  if(!DRIVE.stopped) finishDrive(false);
+}
+
+function finishDrive(manual){
+  if(!DRIVE || DRIVE.stopped) return;
+  DRIVE.stopped = true;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  try{ if(DRIVE.lock) DRIVE.lock.release(); }catch(e){}
+  const mins = Math.max(1, Math.round((Date.now()-DRIVE.t0)/60000));
+  D.log.push({d:todayStr(), n:DRIVE.played, medSec:null, min:mins, mode:"drive"});
+  if(D.log.length>200) D.log.shift();
+  save();
+  if(!manual) speakAsync("おつかれさまでした。今日のドライブレッスンはここまでです。", 1.0, true);
+  clear(); metaEl.textContent = "";
+  const c = card(`
+    <span class="eyebrow">おつかれさま</span>
+    <h1>ドライブレッスン終了</h1>
+    <div class="statrow"><span class="k">流れたカード</span><span class="v">${DRIVE.played}枚</span></div>
+    <div class="statrow"><span class="k">時間</span><span class="v">${mins}分</span></div>
+    <p class="sub" style="margin-top:10px">自己採点が無いため反射速度グラフには入りません。耳と口の「追加の反復」として気楽に流してください。</p>
+    <div class="choices"><button class="btn-primary">ホームへ戻る</button></div>
+  `);
+  c.querySelector("button").onclick = ()=>vHome();
+}
+
+/* =====================================================
    セッション終了・ご褒美
 ===================================================== */
 function endSession(){
   clear(); metaEl.textContent="";
   const med = medianOf(SESSION.secs);
-  D.log.push({d:todayStr(), n:SESSION.done, medSec:med!=null?Math.round(med*10)/10:null, min:SESSION.min});
+  D.log.push({d:todayStr(), n:SESSION.done, medSec:med!=null?Math.round(med*10)/10:null, min:SESSION.min, mode:SESSION.mode||"mix"});
   if(D.log.length>200) D.log.shift();
   save();
 
