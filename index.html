@@ -536,7 +536,12 @@ function speakAsync(text, rate, ja){
     const v = ja ? pickVoiceJa() : pickVoice();
     if(v){ u.voice = v; u.lang = v.lang; } else u.lang = ja ? "ja-JP" : "en-US";
     u.rate = rate || 1.0;
-    u.onend = ()=>res(); u.onerror = ()=>res();
+    // iOSではonend/onerrorが発火しないことがあり、待ちっぱなしになると
+    // ドライブモードのループ全体が止まる。見張りタイマーで必ず先へ進める
+    let done = false;
+    const fin = ()=>{ if(done) return; done = true; clearTimeout(tm); res(); };
+    const tm = setTimeout(fin, 3000 + text.length * 350);
+    u.onend = fin; u.onerror = fin;
     speechSynthesis.speak(u);
   });
 }
@@ -1002,6 +1007,9 @@ let DRIVE = null;
 
 function startDrive(minutes){
   if(!window.speechSynthesis){ alert("この端末では音声合成が使えないため、ドライブモードを開始できません。"); return; }
+  // iOSは最初の読み上げがタップと同じ同期処理内にないと無音になる。
+  // ここ(タップ直下)で空の発話を流して音声をアンロックしておく
+  try{ speechSynthesis.cancel(); speechSynthesis.resume(); speechSynthesis.speak(new SpeechSynthesisUtterance("")); }catch(e){}
   pickVoice(); pickVoiceJa();
   // 出題リスト: 期限切れ復習 → 学習済み → 未習の基礎、の順(文は最大30・チャンクは最大10)
   const seenS = availableSents().filter(x=>D.srs[x.id] && D.srs[x.id].reps>0);
@@ -1020,10 +1028,12 @@ function startDrive(minutes){
 
 async function vDrive(list){
   clear(); metaEl.textContent = "";
-  try{ if(navigator.wakeLock) DRIVE.lock = await navigator.wakeLock.request("screen"); }catch(e){}
+  // wakeLockをawaitすると最初の読み上げがタップ操作から切り離されて
+  // iOSで無音になるため、待たずに取得だけ依頼して先へ進む
+  try{ if(navigator.wakeLock) navigator.wakeLock.request("screen").then(l=>{ if(DRIVE) DRIVE.lock = l; }).catch(()=>{}); }catch(e){}
   const c = card(`
     <span class="eyebrow">ドライブモード ・ ${DRIVE.min}分</span>
-    <p class="sub">「日本語 →(声に出す間)→ 英語×2」が自動で流れ続けます。画面は見なくてOK。<b>操作は停車中に。</b></p>
+    <p class="sub">「日本語 →(声に出す間)→ 英語×2」が自動で流れ続けます。画面は見なくてOK。<b>操作は停車中に。</b>音が出ないときは本体横のサイレントスイッチ(消音)と音量を確認してください。</p>
     <button class="drive-main" data-act="toggle">⏸ 一時停止</button>
     <p class="sub" style="text-align:center;margin-top:10px" data-role="st">再生をはじめます…</p>
     <div class="choices"><button class="btn-ghost" data-act="quit">終了する</button></div>
